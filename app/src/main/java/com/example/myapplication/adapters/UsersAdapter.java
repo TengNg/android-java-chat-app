@@ -6,11 +6,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.myapplication.R;
-import com.example.myapplication.activities.UsersActivity;
 import com.example.myapplication.databinding.ItemContainerUserBinding;
 import com.example.myapplication.listeners.UserListener;
 import com.example.myapplication.models.User;
@@ -58,14 +55,7 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UserViewHold
         void setUserData(User user) {
             this.binding.emailTextView.setText(user.email);
             this.binding.nameTextView.setText(user.name);
-
-            if (user.token != null) {
-                this.binding.activeStatusImage.setVisibility(View.VISIBLE);
-            } else {
-                this.binding.activeStatusImage.setVisibility(View.GONE);
-            }
-
-            binding.getRoot().setOnClickListener(v -> userListener.onUserClicked(user));
+            this.binding.getRoot().setOnClickListener(v -> userListener.onUserClicked(user));
         }
     }
 }

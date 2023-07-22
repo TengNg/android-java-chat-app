@@ -43,8 +43,22 @@
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.917"
+        app:layout_constraintHorizontal_bias="0.9"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.137" />
+        app:layout_constraintTop_toBottomOf="@+id/signOutButton"
+        app:layout_constraintVertical_bias="0.087" />
+
+    <Button
+        android:id="@+id/findFriendsButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Find Friends"
+        android:textSize="12dp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.9"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/showFriendsButton"
+        app:layout_constraintVertical_bias="0.11" />
 </androidx.constraintlayout.widget.ConstraintLayout>

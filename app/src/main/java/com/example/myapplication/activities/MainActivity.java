@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Toast;
 
-import com.example.myapplication.R;
 import com.example.myapplication.databinding.ActivityMainBinding;
 import com.example.myapplication.utilities.Constant;
 import com.example.myapplication.utilities.PreferenceManager;
@@ -31,6 +30,7 @@ public class MainActivity extends AppCompatActivity {
         getToken();
         handleSignOut();
         handleShowFriends();
+        handleFindFriends();
     }
 
     private void showToast(String msg) {
@@ -76,6 +76,12 @@ public class MainActivity extends AppCompatActivity {
 
     private void handleShowFriends() {
         this.binding.showFriendsButton.setOnClickListener(v -> {
+            startActivity(new Intent(getApplicationContext(), FriendsActivity.class));
+        });
+    }
+
+    private void handleFindFriends() {
+        this.binding.findFriendsButton.setOnClickListener(v -> {
             startActivity(new Intent(getApplicationContext(), UsersActivity.class));
         });
     }

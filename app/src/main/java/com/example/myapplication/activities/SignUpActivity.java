@@ -6,12 +6,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Toast;
 
-import com.example.myapplication.R;
 import com.example.myapplication.databinding.ActivitySignUpBinding;
 import com.example.myapplication.utilities.Constant;
 import com.example.myapplication.utilities.PreferenceManager;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.messaging.FirebaseMessagingService;
 
 import java.util.HashMap;
 
@@ -47,12 +45,28 @@ public class SignUpActivity extends AppCompatActivity {
         user.put(Constant.KEY_NAME, binding.signUpUsernameInput.getText().toString());
         user.put(Constant.KEY_EMAIL, binding.signUpEmailInput.getText().toString());
         user.put(Constant.KEY_PASSWORD, binding.signUpPasswordInput.getText().toString());
+
         db.collection(Constant.KEY_COLLECTION_USERS)
                 .add(user)
                 .addOnSuccessListener(documentReference -> {
                     preferenceManager.putBoolean(Constant.KEY_IS_SIGNED_IN, true);
                     preferenceManager.putString(Constant.KEY_USER_ID, documentReference.getId());
                     preferenceManager.putString(Constant.KEY_NAME, binding.signUpUsernameInput.getText().toString());
+
+                    // TODO: add FriendList field for each user sign up
+
+                    // User:
+                    // > docId: 3KzTK74xP440VHn7qRE1
+                    // > name: dang tien
+                    // > email: dtien@gmail.com
+
+//                    HashMap<String, Boolean> friendId = new HashMap<>();
+//                    friendId.put("3KzTK74xP440VHn7qRE1", true);
+//                    db.collection(Constant.KEY_COLLECTION_USERS)
+//                            .document(documentReference.getId())
+//                            .collection(Constant.KEY_FRIENDS)
+//                            .add(friendId);
+
                     Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
@@ -60,6 +74,7 @@ public class SignUpActivity extends AppCompatActivity {
                 .addOnFailureListener(ex -> {
                     showToast(ex.getMessage());
                 });
+
     }
 
     private void handleBackPressed() {

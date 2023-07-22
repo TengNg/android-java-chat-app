@@ -3,6 +3,8 @@ package com.example.myapplication.utilities;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+// UsersActivity > ChatActivity
+
 public class PreferenceManager {
     private final SharedPreferences sharedPreferences;
 

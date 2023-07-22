@@ -11,7 +11,7 @@ public class Constant {
     public static final String KEY_IS_SIGNED_IN = "isSignedIn";
     public static final String KEY_USER_ID = "userId";
     public static final String KEY_FCM_TOKEN = "fcmToken";
-    public static final String KEY_FCM_FRIENDS = "friends";
+    public static final String KEY_FRIENDS = "friends";
 
 
     // Chat ==========

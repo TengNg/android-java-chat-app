@@ -1,7 +1,5 @@
 package com.example.myapplication.adapters;
 
-import static android.content.Intent.getIntent;
-
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
@@ -11,8 +9,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.myapplication.databinding.ItemContainerReceivedMessageBinding;
 import com.example.myapplication.databinding.ItemContainerSentMessageBinding;
 import com.example.myapplication.models.ChatMessage;
-import com.example.myapplication.models.User;
-import com.example.myapplication.utilities.Constant;
 
 import java.util.List;
 
