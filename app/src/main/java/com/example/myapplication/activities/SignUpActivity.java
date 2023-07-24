@@ -60,12 +60,12 @@ public class SignUpActivity extends AppCompatActivity {
                     // > name: dang tien
                     // > email: dtien@gmail.com
 
-//                    HashMap<String, Boolean> friendId = new HashMap<>();
-//                    friendId.put("3KzTK74xP440VHn7qRE1", true);
+                    // HashMap<String, Boolean> friendId = new HashMap<>();
+                    // friendId.put("3KzTK74xP440VHn7qRE1", true);
+
 //                    db.collection(Constant.KEY_COLLECTION_USERS)
 //                            .document(documentReference.getId())
-//                            .collection(Constant.KEY_FRIENDS)
-//                            .add(friendId);
+//                            .collection(Constant.KEY_FRIENDS);
 
                     Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -74,7 +74,6 @@ public class SignUpActivity extends AppCompatActivity {
                 .addOnFailureListener(ex -> {
                     showToast(ex.getMessage());
                 });
-
     }
 
     private void handleBackPressed() {

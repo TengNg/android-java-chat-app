@@ -67,21 +67,6 @@ public class SignInActivity extends AppCompatActivity {
                 });
     }
 
-//    public void addDataToFireStore() {
-//        FirebaseFirestore db = FirebaseFirestore.getInstance();
-//        HashMap<String, Object> data = new HashMap<>();
-//        data.put("first_name", "Tien");
-//        data.put("last_name", "Nguyen");
-//        db.collection("users")
-//                .add(data)
-//                .addOnSuccessListener(documentReference -> {
-//                    Toast.makeText(getApplicationContext(), "Data inserted", Toast.LENGTH_SHORT).show();
-//                })
-//                .addOnFailureListener(ex -> {
-//                    Toast.makeText(getApplicationContext(), ex.getMessage(), Toast.LENGTH_SHORT).show();
-//                });
-//    }
-
     public boolean isValidInput() {
         if (binding.loginEmailInput.getText().toString().isEmpty()) {
             showToast("Please enter your email");

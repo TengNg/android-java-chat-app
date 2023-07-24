@@ -9,12 +9,4 @@ public class User implements Serializable {
     public String name;
     public String token;
     public String id; // could be senderId or receiverId
-    public boolean isActive;
-
-    public User withDocId(String docID) {
-        if (this.id.equals(docID))
-            return this;
-        return null;
-    }
 }
-

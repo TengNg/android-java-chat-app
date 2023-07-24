@@ -2,8 +2,93 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/username"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".activities.UserInfoActivity">
+
+    <TextView
+        android:id="@+id/usernameTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="56dp"
+        android:text="Username show here"
+        android:textSize="20dp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="377dp"
+        android:layout_height="278dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.47"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/usernameTextView"
+        android:padding="16dp"
+        >
+
+        <TextView
+            android:id="@+id/userEmailTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="User email"
+            android:textSize="20dp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/userGenderTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="User gender"
+            android:textSize="20dp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/user"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Other info"
+            android:textSize="20dp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/imageBack"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:background="@drawable/ic_back"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+    />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/addFriendImage"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginStart="8dp"
+        android:background="@drawable/ic_add_friend"
+        app:layout_constraintBottom_toBottomOf="@+id/messageImage"
+        app:layout_constraintStart_toEndOf="@+id/messageImage"
+        app:layout_constraintTop_toTopOf="@+id/messageImage"
+    />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/messageImage"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:background="@drawable/ic_message"
+        android:layout_marginStart="8dp"
+        app:layout_constraintBottom_toBottomOf="@+id/usernameTextView"
+        app:layout_constraintStart_toEndOf="@+id/usernameTextView"
+        app:layout_constraintTop_toTopOf="@+id/usernameTextView"
+    />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
