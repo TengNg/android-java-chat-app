@@ -143,7 +143,6 @@ public class UsersActivity extends AppCompatActivity implements UserListener {
 
     @Override
     public void onAddFriendButtonClicked(User user) {
-
         HashMap<String, Boolean> friendId1 = new HashMap<>();
         friendId1.put(user.id, true);
         this.db.collection(Constant.KEY_COLLECTION_USERS)

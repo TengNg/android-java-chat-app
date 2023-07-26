@@ -3,6 +3,7 @@ package com.example.myapplication.activities;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 
 import com.example.myapplication.adapters.ChatAdapter;
@@ -12,6 +13,7 @@ import com.example.myapplication.models.User;
 import com.example.myapplication.utilities.Constant;
 import com.example.myapplication.utilities.PreferenceManager;
 import com.google.firebase.firestore.DocumentChange;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -42,6 +44,7 @@ public class ChatActivity extends AppCompatActivity {
         initialize();
         handleSendMessage();
         listenMessages();
+        listenFriendActiveStatus();
     }
 
     private void initialize() {
@@ -114,6 +117,34 @@ public class ChatActivity extends AppCompatActivity {
 
         this.binding.progressCircular.setVisibility(View.GONE);
     };
+
+
+    private void listenFriendActiveStatus() {
+        DocumentReference docRef = db.collection(Constant.KEY_COLLECTION_USERS)
+                .document(((User) getIntent().getSerializableExtra(Constant.KEY_USER)).id);
+
+        docRef.addSnapshotListener((snapshot, e) -> {
+            if (e != null) {
+                Log.e("Firestore", "Error listening for document changes.", e);
+                return;
+            }
+
+            if (snapshot != null && snapshot.exists()) {
+                String token = snapshot.getString(Constant.KEY_FCM_TOKEN);
+
+                if (token != null) {
+                    this.binding.activeStatusImage.setVisibility(View.VISIBLE);
+                } else {
+                    this.binding.activeStatusImage.setVisibility(View.INVISIBLE);
+                }
+
+            } else {
+                // The document has been deleted.
+                Log.d("Firestore", "Document does not exist.");
+            }
+        });
+    }
+
 
     private void getReceiverInfo() {
         this.receiver = (User) getIntent().getSerializableExtra(Constant.KEY_USER);
