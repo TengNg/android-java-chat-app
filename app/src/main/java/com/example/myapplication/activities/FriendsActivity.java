@@ -103,7 +103,7 @@ public class FriendsActivity extends AppCompatActivity implements FriendListener
     private void getFriends() {
         String specificUserID = this.preferenceManager.getString(Constant.KEY_USER_ID);
         CollectionReference usersRef = db.collection(Constant.KEY_COLLECTION_USERS);
-        CollectionReference specificUserFriendsRef = db.collection(Constant.KEY_COLLECTION_USERS).document(specificUserID).collection(Constant.KEY_FRIENDS);
+        CollectionReference specificUserFriendsRef = db.collection(Constant.KEY_COLLECTION_USERS).document(specificUserID).collection(Constant.KEY_COLLECTION_USER_FRIENDS);
 
         specificUserFriendsRef.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {

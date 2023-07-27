@@ -13,19 +13,14 @@ import com.example.myapplication.listeners.UserListener;
 import com.example.myapplication.models.User;
 import com.example.myapplication.utilities.Constant;
 import com.example.myapplication.utilities.PreferenceManager;
-import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentChange;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class UsersActivity extends AppCompatActivity implements UserListener {
     private ActivityUsersBinding binding;
@@ -147,14 +142,14 @@ public class UsersActivity extends AppCompatActivity implements UserListener {
         friendId1.put(user.id, true);
         this.db.collection(Constant.KEY_COLLECTION_USERS)
                 .document(this.preferenceManager.getString(Constant.KEY_USER_ID))
-                .collection(Constant.KEY_FRIENDS)
+                .collection(Constant.KEY_COLLECTION_USER_FRIENDS)
                 .add(friendId1);
 
         HashMap<String, Boolean> friendId2 = new HashMap<>();
         friendId2.put(this.preferenceManager.getString(Constant.KEY_USER_ID), true);
         this.db.collection(Constant.KEY_COLLECTION_USERS)
                 .document(user.id)
-                .collection(Constant.KEY_FRIENDS)
+                .collection(Constant.KEY_COLLECTION_USER_FRIENDS)
                 .add(friendId2);
 
         Toast.makeText(getApplicationContext(), "Friend added", Toast.LENGTH_SHORT).show();

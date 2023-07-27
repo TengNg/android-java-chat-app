@@ -1,9 +1,18 @@
 package com.example.myapplication.activities;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContract;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
+import android.util.Base64;
+import android.view.View;
 import android.widget.Toast;
 
 import com.example.myapplication.databinding.ActivitySignUpBinding;
@@ -11,11 +20,16 @@ import com.example.myapplication.utilities.Constant;
 import com.example.myapplication.utilities.PreferenceManager;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.HashMap;
 
 public class SignUpActivity extends AppCompatActivity {
     private ActivitySignUpBinding binding;
     private PreferenceManager preferenceManager;
+
+    private String encodedImage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,14 +39,53 @@ public class SignUpActivity extends AppCompatActivity {
         this.preferenceManager = new PreferenceManager(getApplicationContext());
         handleBackPressed();
         handleSignUp();
+        handlePickingProfileImage();
     }
 
     private void showToast(String msg) {
         Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
     }
 
+    private String encodeImage(Bitmap bitmap) {
+        int previewWidth = 150;
+        int previewHeight = bitmap.getHeight() * previewWidth / bitmap.getWidth();
+        Bitmap previewBitmap = Bitmap.createScaledBitmap(bitmap, previewWidth, previewHeight, false);
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        previewBitmap.compress(Bitmap.CompressFormat.JPEG, 50, byteArrayOutputStream);
+        byte[] bytes = byteArrayOutputStream.toByteArray();
+        return Base64.encodeToString(bytes, Base64.DEFAULT);
+    }
+
+    private ActivityResultLauncher<Intent> pickImage = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == RESULT_OK) {
+                    if (result.getData() != null) {
+                        Uri imageUri = result.getData().getData();
+                        try {
+                            InputStream inputStream = getContentResolver().openInputStream(imageUri);
+                            Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+                            this.binding.profileImage.setImageBitmap(bitmap);
+                            this.binding.addImageTextView.setVisibility(View.GONE);
+                            this.encodedImage = this.encodeImage(bitmap);
+                        } catch (FileNotFoundException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                }
+            }
+    );
+
+    private void handlePickingProfileImage() {
+        this.binding.addImageLayout.setOnClickListener(v -> {
+            Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            this.pickImage.launch(intent);
+        });
+    }
+
     private void handleSignUp() {
-        binding.signUpButton.setOnClickListener(v -> {
+        this.binding.signUpButton.setOnClickListener(v -> {
             if (isValidInput()) {
                 signUp();
             }
@@ -46,26 +99,20 @@ public class SignUpActivity extends AppCompatActivity {
         user.put(Constant.KEY_EMAIL, binding.signUpEmailInput.getText().toString());
         user.put(Constant.KEY_PASSWORD, binding.signUpPasswordInput.getText().toString());
 
+        if (this.binding.maleRadioButton.isChecked()) {
+            user.put(Constant.KEY_GENDER, this.binding.maleRadioButton.getText().toString());
+        } else if (this.binding.femaleRadioButton.isChecked()) {
+            user.put(Constant.KEY_GENDER, this.binding.femaleRadioButton.getText().toString());
+        }
+
+        user.put(Constant.KEY_IMAGE, this.encodedImage);
+
         db.collection(Constant.KEY_COLLECTION_USERS)
                 .add(user)
                 .addOnSuccessListener(documentReference -> {
                     preferenceManager.putBoolean(Constant.KEY_IS_SIGNED_IN, true);
                     preferenceManager.putString(Constant.KEY_USER_ID, documentReference.getId());
                     preferenceManager.putString(Constant.KEY_NAME, binding.signUpUsernameInput.getText().toString());
-
-                    // TODO: add FriendList field for each user sign up
-
-                    // User:
-                    // > docId: 3KzTK74xP440VHn7qRE1
-                    // > name: dang tien
-                    // > email: dtien@gmail.com
-
-                    // HashMap<String, Boolean> friendId = new HashMap<>();
-                    // friendId.put("3KzTK74xP440VHn7qRE1", true);
-
-//                    db.collection(Constant.KEY_COLLECTION_USERS)
-//                            .document(documentReference.getId())
-//                            .collection(Constant.KEY_FRIENDS);
 
                     Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -105,6 +152,12 @@ public class SignUpActivity extends AppCompatActivity {
 
         if (!binding.signUpConfirmPasswordInput.getText().toString().equals(binding.signUpPasswordInput.getText().toString())) {
             showToast("Password is not matched");
+            return false;
+        }
+
+        if (this.binding.genderRadioGroup.getCheckedRadioButtonId() == -1)
+        {
+            showToast("Select your gender");
             return false;
         }
 
