@@ -14,6 +14,7 @@ public class Constant {
     public static final String KEY_USER_ID = "userId";
     public static final String KEY_FCM_TOKEN = "fcmToken";
     public static final String KEY_COLLECTION_USER_FRIENDS = "friends";
+    public static final String KEY_COLLECTION_FRIEND_REQUESTS = "friendRequests";
 
 
     // Chat ==========

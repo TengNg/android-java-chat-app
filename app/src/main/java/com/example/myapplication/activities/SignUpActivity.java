@@ -12,12 +12,14 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Base64;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
 import com.example.myapplication.databinding.ActivitySignUpBinding;
 import com.example.myapplication.utilities.Constant;
 import com.example.myapplication.utilities.PreferenceManager;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.io.ByteArrayOutputStream;
@@ -108,19 +110,47 @@ public class SignUpActivity extends AppCompatActivity {
         user.put(Constant.KEY_IMAGE, this.encodedImage);
 
         db.collection(Constant.KEY_COLLECTION_USERS)
-                .add(user)
-                .addOnSuccessListener(documentReference -> {
-                    preferenceManager.putBoolean(Constant.KEY_IS_SIGNED_IN, true);
-                    preferenceManager.putString(Constant.KEY_USER_ID, documentReference.getId());
-                    preferenceManager.putString(Constant.KEY_NAME, binding.signUpUsernameInput.getText().toString());
+                .whereEqualTo(Constant.KEY_EMAIL, this.binding.signUpEmailInput.getText().toString())
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        boolean emailExists = !task.getResult().isEmpty();
+                        if (emailExists) {
+                            this.showToast("Email exists");
+                        } else {
+                            this.showToast("Loading...");
+                            DocumentReference newUserRef = db.collection(Constant.KEY_COLLECTION_USERS).document();
+                            newUserRef.set(user);
+                            preferenceManager.putBoolean(Constant.KEY_IS_SIGNED_IN, true);
+                            preferenceManager.putString(Constant.KEY_USER_ID, newUserRef.getId());
+                            preferenceManager.putString(Constant.KEY_NAME, binding.signUpUsernameInput.getText().toString());
+                            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                            startActivity(intent);
+                        }
 
-                    Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    startActivity(intent);
+                    } else {
+                        this.showToast("Error");
+                    }
                 })
                 .addOnFailureListener(ex -> {
                     showToast(ex.getMessage());
                 });
+
+//        db.collection(Constant.KEY_COLLECTION_USERS)
+//                .add(user)
+//                .addOnSuccessListener(documentReference -> {
+//                    preferenceManager.putBoolean(Constant.KEY_IS_SIGNED_IN, true);
+//                    preferenceManager.putString(Constant.KEY_USER_ID, documentReference.getId());
+//                    preferenceManager.putString(Constant.KEY_NAME, binding.signUpUsernameInput.getText().toString());
+//
+//                    Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+//                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//                    startActivity(intent);
+//                })
+//                .addOnFailureListener(ex -> {
+//                    showToast(ex.getMessage());
+//                });
     }
 
     private void handleBackPressed() {

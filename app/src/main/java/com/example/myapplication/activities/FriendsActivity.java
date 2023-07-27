@@ -87,43 +87,35 @@ public class FriendsActivity extends AppCompatActivity implements FriendListener
         if (value != null) {
             String specificUserID = this.preferenceManager.getString(Constant.KEY_USER_ID);
             CollectionReference usersRef = db.collection(Constant.KEY_COLLECTION_USERS);
-            CollectionReference specificUserFriendsRef = db.collection(Constant.KEY_COLLECTION_USERS).document(specificUserID).collection(Constant.KEY_COLLECTION_USER_FRIENDS);
+//            CollectionReference specificUserFriendsRef = db.collection(Constant.KEY_COLLECTION_USERS).document(specificUserID).collection(Constant.KEY_COLLECTION_USER_FRIENDS);
 
             for (DocumentChange documentChange : value.getDocumentChanges()) {
-                Map<String, Object> map = documentChange.getDocument().getData();
-
+                String friendId = documentChange.getDocument().getData().keySet().iterator().next(); // get only first field in a document
                 if (documentChange.getType() == DocumentChange.Type.ADDED) {
-                    if (map == null) continue;
+                    DocumentReference friendUserRef = usersRef.document(friendId);
+                    friendUserRef.get().addOnCompleteListener(friendTask -> {
+                        if (friendTask.isSuccessful()) {
+                            DocumentSnapshot friendDocument = friendTask.getResult();
+                            if (friendDocument.exists()) {
+                                String friendUsername = friendDocument.getString(Constant.KEY_NAME);
+                                String friendEmail = friendDocument.getString(Constant.KEY_EMAIL);
+                                String friendToken = friendDocument.getString(Constant.KEY_FCM_TOKEN);
 
-                    // get all friend ids
-                    for (Map.Entry<String, Object> entry : map.entrySet()) {
-                        String friendId = entry.getKey();
+                                User user = new User();
+                                user.name = friendUsername;
+                                user.email = friendEmail;
+                                user.token = friendToken;
+                                user.id = friendTask.getResult().getId();
 
-                        DocumentReference friendUserRef = usersRef.document(friendId);
-                        friendUserRef.get().addOnCompleteListener(friendTask -> {
-                            if (friendTask.isSuccessful()) {
-                                DocumentSnapshot friendDocument = friendTask.getResult();
-                                if (friendDocument.exists()) {
-                                    String friendUsername = friendDocument.getString(Constant.KEY_NAME);
-                                    String friendEmail = friendDocument.getString(Constant.KEY_EMAIL);
-                                    String friendToken = friendDocument.getString(Constant.KEY_FCM_TOKEN);
-
-                                    User user = new User();
-                                    user.name = friendUsername;
-                                    user.email = friendEmail;
-                                    user.token = friendToken;
-                                    user.id = friendTask.getResult().getId();
-
-                                    this.users.add(user);
-                                    this.friendsAdapter.notifyDataSetChanged();
-                                } else {
-                                    Log.d("FriendInfo", "Friend document does not exist");
-                                }
+                                this.users.add(user);
+                                this.friendsAdapter.notifyDataSetChanged();
                             } else {
-                                Log.e("Error", "Error getting friend document: ", friendTask.getException());
+                                Log.d("FriendInfo", "Friend document does not exist");
                             }
-                        });
-                    }
+                        } else {
+                            Log.e("Error", "Error getting friend document: ", friendTask.getException());
+                        }
+                    });
                 }
             }
 

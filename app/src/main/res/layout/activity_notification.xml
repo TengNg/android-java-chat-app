@@ -2,10 +2,9 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/ConstraintLayout1"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activities.FriendsActivity">
+    tools:context=".activities.NotificationActivity">
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/backButton"
@@ -19,33 +18,18 @@
         />
 
     <TextView
-        android:id="@+id/friendsTextView"
+        android:id="@+id/findMoreFriendsTextView"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:text="Friends"
+        android:text="Notifications"
         android:textSize="20dp"
         android:textStyle="bold"
+        android:layout_marginEnd="46dp"
+        app:layout_constraintBottom_toBottomOf="@+id/backButton"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/backButton"
         app:layout_constraintTop_toTopOf="@+id/backButton" />
-
-    <EditText
-        android:id="@+id/searchInput"
-        android:layout_width="0dp"
-        android:layout_height="45dp"
-        android:background="@drawable/back_with_border"
-        android:hint="Search 🔎"
-        android:imeOptions="actionDone"
-        android:inputType="text"
-        android:paddingStart="16dp"
-        android:paddingRight="10dp"
-        android:textSize="16dp"
-        android:layout_margin="16dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/friendsTextView"
-    />
 
     <LinearLayout
         android:id="@+id/frameLayout"
@@ -56,10 +40,10 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/searchInput">
+        app:layout_constraintTop_toBottomOf="@+id/backButton">
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/friendsRecyclerView"
+            android:id="@+id/notificationsRecyclerView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clipToPadding="false"
@@ -78,27 +62,5 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/friendRequestCountTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="top"
-        android:background="@drawable/ic_red_circle"
-        android:gravity="center"
-        android:text="1"
-        android:textColor="@color/white"
-        app:layout_constraintEnd_toStartOf="@+id/pendingButton"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <Button
-        android:id="@+id/pendingButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Pending"
-        app:layout_constraintBottom_toBottomOf="@+id/friendsTextView"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/friendsTextView"
-        app:layout_constraintTop_toTopOf="@+id/friendsTextView" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
