@@ -24,8 +24,10 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class FriendsActivity extends AppCompatActivity implements FriendListener {
     private ActivityFriendsBinding binding;
@@ -33,7 +35,7 @@ public class FriendsActivity extends AppCompatActivity implements FriendListener
     private List<User> users;
     private FriendsAdapter friendsAdapter;
     private FirebaseFirestore db;
-    private List<String> friendIDs;
+    private Set<String> friendIDs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,13 +46,14 @@ public class FriendsActivity extends AppCompatActivity implements FriendListener
         this.binding.progressCircular.setVisibility(View.VISIBLE);
         this.handleBackPressed();
         initialize();
-        getFriends();
+//        getFriend();
         listenFriends();
+        listenActiveStatus();
     }
 
     private void initialize() {
         this.users = new ArrayList<>();
-        this.friendIDs = new ArrayList<>();
+        this.friendIDs = new HashSet<>();
         this.friendsAdapter = new FriendsAdapter(this.users, this);
         this.db = FirebaseFirestore.getInstance();
         this.binding.friendsRecyclerView.setAdapter(friendsAdapter);
@@ -64,10 +67,70 @@ public class FriendsActivity extends AppCompatActivity implements FriendListener
         this.binding.backButton.setOnClickListener(v -> onBackPressed());
     }
 
-    private void listenFriends() {
+    private void listenActiveStatus() {
         db.collection(Constant.KEY_COLLECTION_USERS)
                 .addSnapshotListener(eventListener);
     }
+
+    private void listenFriends() {
+        db.collection(Constant.KEY_COLLECTION_USERS)
+                .document(this.preferenceManager.getString(Constant.KEY_USER_ID))
+                .collection(Constant.KEY_COLLECTION_USER_FRIENDS)
+                .addSnapshotListener(eventListener2);
+    }
+
+    private final EventListener<QuerySnapshot> eventListener2 = (value, error) -> {
+        if (error != null) {
+            return;
+        }
+
+        if (value != null) {
+            String specificUserID = this.preferenceManager.getString(Constant.KEY_USER_ID);
+            CollectionReference usersRef = db.collection(Constant.KEY_COLLECTION_USERS);
+            CollectionReference specificUserFriendsRef = db.collection(Constant.KEY_COLLECTION_USERS).document(specificUserID).collection(Constant.KEY_COLLECTION_USER_FRIENDS);
+
+            for (DocumentChange documentChange : value.getDocumentChanges()) {
+                Map<String, Object> map = documentChange.getDocument().getData();
+
+                if (documentChange.getType() == DocumentChange.Type.ADDED) {
+                    if (map == null) continue;
+
+                    // get all friend ids
+                    for (Map.Entry<String, Object> entry : map.entrySet()) {
+                        String friendId = entry.getKey();
+
+                        DocumentReference friendUserRef = usersRef.document(friendId);
+                        friendUserRef.get().addOnCompleteListener(friendTask -> {
+                            if (friendTask.isSuccessful()) {
+                                DocumentSnapshot friendDocument = friendTask.getResult();
+                                if (friendDocument.exists()) {
+                                    String friendUsername = friendDocument.getString(Constant.KEY_NAME);
+                                    String friendEmail = friendDocument.getString(Constant.KEY_EMAIL);
+                                    String friendToken = friendDocument.getString(Constant.KEY_FCM_TOKEN);
+
+                                    User user = new User();
+                                    user.name = friendUsername;
+                                    user.email = friendEmail;
+                                    user.token = friendToken;
+                                    user.id = friendTask.getResult().getId();
+
+                                    this.users.add(user);
+                                    this.friendsAdapter.notifyDataSetChanged();
+                                } else {
+                                    Log.d("FriendInfo", "Friend document does not exist");
+                                }
+                            } else {
+                                Log.e("Error", "Error getting friend document: ", friendTask.getException());
+                            }
+                        });
+                    }
+                }
+            }
+
+        } else {
+            this.showErrorMsg();
+        }
+    };
 
     private final EventListener<QuerySnapshot> eventListener = (value, error) -> {
         if (error != null) {
@@ -100,61 +163,61 @@ public class FriendsActivity extends AppCompatActivity implements FriendListener
         this.binding.progressCircular.setVisibility(View.GONE);
     };
 
-    private void getFriends() {
-        String specificUserID = this.preferenceManager.getString(Constant.KEY_USER_ID);
-        CollectionReference usersRef = db.collection(Constant.KEY_COLLECTION_USERS);
-        CollectionReference specificUserFriendsRef = db.collection(Constant.KEY_COLLECTION_USERS).document(specificUserID).collection(Constant.KEY_COLLECTION_USER_FRIENDS);
-
-        specificUserFriendsRef.get().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                for (QueryDocumentSnapshot document : task.getResult()) {
-                    this.friendIDs = new ArrayList<>();
-                    Map<String, Object> map = document.getData();
-
-                    if (map == null) continue;
-
-                    // get all friend ids
-                    for (Map.Entry<String, Object> entry : map.entrySet()) {
-                        this.friendIDs.add(entry.getKey());
-                    }
-
-                    // > iterative through friend ids
-                    // > get friend info (user details)
-                    // > add to friendsAdapter
-                    for (String friendID : this.friendIDs) {
-                        DocumentReference friendUserRef = usersRef.document(friendID);
-                        friendUserRef.get().addOnCompleteListener(friendTask -> {
-                            if (friendTask.isSuccessful()) {
-                                DocumentSnapshot friendDocument = friendTask.getResult();
-                                if (friendDocument.exists()) {
-                                    String friendUsername = friendDocument.getString(Constant.KEY_NAME);
-                                    String friendEmail = friendDocument.getString(Constant.KEY_EMAIL);
-                                    String friendToken = friendDocument.getString(Constant.KEY_FCM_TOKEN);
-
-                                    User user = new User();
-                                    user.name = friendUsername;
-                                    user.email = friendEmail;
-                                    user.token = friendToken;
-                                    user.id = friendTask.getResult().getId();
-
-                                    this.users.add(user);
-                                    this.friendsAdapter.notifyDataSetChanged();
-                                } else {
-                                    Log.d("FriendInfo", "Friend document does not exist");
-                                }
-                            } else {
-                                Log.e("Error", "Error getting friend document: ", friendTask.getException());
-                            }
-                        });
-                    }
-                }
-                this.binding.progressCircular.setVisibility(View.GONE);
-            } else {
-                Log.e("Error", "Error getting friends for specific user: " + specificUserID, task.getException());
-            }
-        });
-
-    }
+//    private void getFriends() {
+//        String specificUserID = this.preferenceManager.getString(Constant.KEY_USER_ID);
+//        CollectionReference usersRef = db.collection(Constant.KEY_COLLECTION_USERS);
+//        CollectionReference specificUserFriendsRef = db.collection(Constant.KEY_COLLECTION_USERS).document(specificUserID).collection(Constant.KEY_COLLECTION_USER_FRIENDS);
+//
+//        specificUserFriendsRef.get().addOnCompleteListener(task -> {
+//            if (task.isSuccessful()) {
+//                for (QueryDocumentSnapshot document : task.getResult()) {
+//                    Map<String, Object> map = document.getData();
+//
+//                    if (map == null) continue;
+//
+//                    // get all friend ids
+//                    for (Map.Entry<String, Object> entry : map.entrySet()) {
+//                        this.friendIDs.add(entry.getKey());
+//                    }
+//                }
+//
+//                // > iterative through friend ids
+//                // > get friend info (user details)
+//                // > add to friendsAdapter
+//                for (String friendID : this.friendIDs) {
+//                    DocumentReference friendUserRef = usersRef.document(friendID);
+//                    friendUserRef.get().addOnCompleteListener(friendTask -> {
+//                        if (friendTask.isSuccessful()) {
+//                            DocumentSnapshot friendDocument = friendTask.getResult();
+//                            if (friendDocument.exists()) {
+//                                String friendUsername = friendDocument.getString(Constant.KEY_NAME);
+//                                String friendEmail = friendDocument.getString(Constant.KEY_EMAIL);
+//                                String friendToken = friendDocument.getString(Constant.KEY_FCM_TOKEN);
+//
+//                                User user = new User();
+//                                user.name = friendUsername;
+//                                user.email = friendEmail;
+//                                user.token = friendToken;
+//                                user.id = friendTask.getResult().getId();
+//
+//                                this.users.add(user);
+//                                this.friendsAdapter.notifyDataSetChanged();
+//                            } else {
+//                                Log.d("FriendInfo", "Friend document does not exist");
+//                            }
+//                        } else {
+//                            Log.e("Error", "Error getting friend document: ", friendTask.getException());
+//                        }
+//                    });
+//                }
+//
+//                this.binding.progressCircular.setVisibility(View.GONE);
+//            } else {
+//                Log.e("Error", "Error getting friends for specific user: " + specificUserID, task.getException());
+//            }
+//        });
+//
+//    }
 
     @Override
     public void onFriendClicked(User user) {
