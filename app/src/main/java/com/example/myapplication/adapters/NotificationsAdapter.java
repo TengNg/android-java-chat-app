@@ -1,16 +1,50 @@
 package com.example.myapplication.adapters;
 
 import android.app.Notification;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.myapplication.databinding.ItemContainerFriendRequestPendingBinding;
 import com.example.myapplication.databinding.ItemContainerNotificationBinding;
+import com.example.myapplication.listeners.NotificationListener;
 import com.example.myapplication.models.FriendRequest;
 
 import java.util.List;
 
-public class NotificationsAdapter {
-    List<Notification> notifications;
+public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdapter.FriendRequestNotificationViewHolder> {
+    List<FriendRequest> notifications;
+    NotificationListener notificationListener;
+
+    public NotificationsAdapter(List<FriendRequest> notifications, NotificationListener notificationListener) {
+        this.notifications = notifications;
+        this.notificationListener = notificationListener;
+    }
+
+    @NonNull
+    @Override
+    public FriendRequestNotificationViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        ItemContainerNotificationBinding binding = ItemContainerNotificationBinding.inflate(
+                LayoutInflater.from(parent.getContext()),
+                parent,
+                false
+        );
+        return new FriendRequestNotificationViewHolder(binding);
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull FriendRequestNotificationViewHolder holder, int position) {
+        holder.setNotificationData(notifications.get(position));
+    }
+
+    @Override
+    public int getItemCount() {
+        return this.notifications.size();
+    }
+
 
     class FriendRequestNotificationViewHolder extends RecyclerView.ViewHolder {
         ItemContainerNotificationBinding binding;
@@ -25,6 +59,9 @@ public class NotificationsAdapter {
 
             this.binding.notificationTextView.setText(msg);
             this.binding.dateTextView.setText(friendRequest.dateTime);
+
+            this.binding.getRoot().setOnClickListener(v -> notificationListener.onNotificationClicked());
         }
     }
+
 }

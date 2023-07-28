@@ -31,6 +31,7 @@ public class MainActivity extends AppCompatActivity {
         handleSignOut();
         handleShowFriends();
         handleFindFriends();
+        handleShowNotifications();
     }
 
     private void showToast(String msg) {
@@ -83,6 +84,12 @@ public class MainActivity extends AppCompatActivity {
     private void handleFindFriends() {
         this.binding.findFriendsButton.setOnClickListener(v -> {
             startActivity(new Intent(getApplicationContext(), UsersActivity.class));
+        });
+    }
+
+    private void handleShowNotifications() {
+        this.binding.notificationsButton.setOnClickListener(v -> {
+            startActivity(new Intent(getApplicationContext(), NotificationActivity.class));
         });
     }
 }

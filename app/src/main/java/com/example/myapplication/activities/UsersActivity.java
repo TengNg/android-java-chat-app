@@ -66,6 +66,10 @@ public class UsersActivity extends AppCompatActivity implements UserListener {
         Toast.makeText(getApplicationContext(), "Error", Toast.LENGTH_SHORT).show();
     }
 
+    private void showToast(String msg) {
+        Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
+    }
+
     private void handleBackPressed() {
         this.binding.backButton.setOnClickListener(v -> onBackPressed());
     }
@@ -183,24 +187,36 @@ public class UsersActivity extends AppCompatActivity implements UserListener {
 
         // TODO: send notification to NotificationActivity & FriendsActivity
         String senderId = this.preferenceManager.getString(Constant.KEY_USER_ID);
+        String senderName = this.preferenceManager.getString(Constant.KEY_NAME);
         String receiverId = user.id;
+        String receiverName = user.name;
         String friendRequestID = this.db.collection(Constant.KEY_COLLECTION_FRIEND_REQUESTS).document().getId();
         HashMap<String, Object> friendRequestData = new HashMap<>();
-        friendRequestData.put("senderID", senderId);
-        friendRequestData.put("receiverID", receiverId);
+        friendRequestData.put("senderId", senderId);
+        friendRequestData.put("senderName", senderName);
+        friendRequestData.put("receiverId", receiverId);
+        friendRequestData.put("receiverName", receiverName);
         friendRequestData.put("status", "pending");
         friendRequestData.put("timestamp", new Date());
 
         this.db.collection(Constant.KEY_COLLECTION_FRIEND_REQUESTS)
-                .document(friendRequestID)
-                .set(friendRequestData)
-                .addOnSuccessListener(aVoid -> {
-                    // Friend request sent successfully
-                    Toast.makeText(getApplicationContext(), "Friend request sent", Toast.LENGTH_SHORT).show();
+                .whereEqualTo(Constant.KEY_SENDER_ID, senderId)
+                .whereEqualTo(Constant.KEY_RECEIVER_ID, receiverId)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        boolean isSent = !task.getResult().isEmpty();
+                        if (isSent) {
+                            this.showToast("You have already sent friend request to this user");
+                        } else {
+                            DocumentReference newNotificationRef = db.collection(Constant.KEY_COLLECTION_FRIEND_REQUESTS).document();
+                            newNotificationRef.set(friendRequestData);
+                            this.showToast("Friend request sent");
+                        }
+                    }
                 })
                 .addOnFailureListener(e -> {
-                    // Error occurred while sending friend request
-                    Toast.makeText(getApplicationContext(), "Error", Toast.LENGTH_SHORT).show();
+                    this.showErrorMsg();
                 });
     }
 
@@ -209,9 +225,5 @@ public class UsersActivity extends AppCompatActivity implements UserListener {
         Intent intent = new Intent(getApplicationContext(), ChatActivity.class);
         intent.putExtra(Constant.KEY_USER, user);
         startActivity(intent);
-    }
-
-    private String getSimpleMessageDateTime(Date date) {
-        return new SimpleDateFormat("MMMM dd, yyyy - hh:mm a", Locale.getDefault()).format(date);
     }
 }

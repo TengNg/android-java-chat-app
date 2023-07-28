@@ -9,6 +9,5 @@ public class FriendRequest {
     public String receiverName;
     public String dateTime;
     public String status;
-    public String timestamp;
     public Date dateObject;
 }

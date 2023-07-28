@@ -35,7 +35,6 @@ public class FriendsActivity extends AppCompatActivity implements FriendListener
     private List<User> users;
     private FriendsAdapter friendsAdapter;
     private FirebaseFirestore db;
-    private Set<String> friendIDs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,15 +44,17 @@ public class FriendsActivity extends AppCompatActivity implements FriendListener
         this.preferenceManager = new PreferenceManager(getApplicationContext());
         this.binding.progressCircular.setVisibility(View.VISIBLE);
         this.handleBackPressed();
-        initialize();
+        this.handleShowFriendRequests();
+        this.initialize();
 //        getFriend();
-        listenFriends();
-        listenActiveStatus();
+        this.listenFriends();
+        this.listenActiveStatus();
+        this.listenFriendRequests();
+//        this.getFriendRequestCount();
     }
 
     private void initialize() {
         this.users = new ArrayList<>();
-        this.friendIDs = new HashSet<>();
         this.friendsAdapter = new FriendsAdapter(this.users, this);
         this.db = FirebaseFirestore.getInstance();
         this.binding.friendsRecyclerView.setAdapter(friendsAdapter);
@@ -67,32 +68,60 @@ public class FriendsActivity extends AppCompatActivity implements FriendListener
         this.binding.backButton.setOnClickListener(v -> onBackPressed());
     }
 
+    private void handleShowFriendRequests() {
+        this.binding.pendingButton.setOnClickListener(v -> {
+            startActivity(new Intent(getApplicationContext(), FriendRequestsActivity.class));
+        });
+    }
+
     private void listenActiveStatus() {
         db.collection(Constant.KEY_COLLECTION_USERS)
-                .addSnapshotListener(eventListener);
+                .addSnapshotListener(friendsActiveStatusEventListener);
     }
 
     private void listenFriends() {
         db.collection(Constant.KEY_COLLECTION_USERS)
                 .document(this.preferenceManager.getString(Constant.KEY_USER_ID))
                 .collection(Constant.KEY_COLLECTION_USER_FRIENDS)
-                .addSnapshotListener(eventListener2);
+                .addSnapshotListener(friendsEventListener);
     }
 
-    private final EventListener<QuerySnapshot> eventListener2 = (value, error) -> {
+    private void listenFriendRequests() {
+        db.collection(Constant.KEY_COLLECTION_FRIEND_REQUESTS)
+                .whereEqualTo(Constant.KEY_RECEIVER_ID, this.preferenceManager.getString(Constant.KEY_USER_ID))
+                .whereEqualTo(Constant.KEY_FRIEND_REQUEST_STATUS, "pending")
+                .addSnapshotListener(friendRequestsEventListener);
+    }
+
+    private final EventListener<QuerySnapshot> friendRequestsEventListener = (value, error) -> {
         if (error != null) {
             return;
         }
 
         if (value != null) {
-            String specificUserID = this.preferenceManager.getString(Constant.KEY_USER_ID);
+            long requestCount = value.size();
+            if (requestCount == 0) {
+                this.binding.friendRequestCountTextView.setVisibility(View.GONE);
+            } else {
+                this.binding.friendRequestCountTextView.setText(String.valueOf(requestCount));
+            }
+        }
+    };
+
+    private final EventListener<QuerySnapshot> friendsEventListener = (value, error) -> {
+        if (error != null) {
+            return;
+        }
+
+        if (value != null) {
             CollectionReference usersRef = db.collection(Constant.KEY_COLLECTION_USERS);
-//            CollectionReference specificUserFriendsRef = db.collection(Constant.KEY_COLLECTION_USERS).document(specificUserID).collection(Constant.KEY_COLLECTION_USER_FRIENDS);
 
             for (DocumentChange documentChange : value.getDocumentChanges()) {
                 String friendId = documentChange.getDocument().getData().keySet().iterator().next(); // get only first field in a document
                 if (documentChange.getType() == DocumentChange.Type.ADDED) {
+
                     DocumentReference friendUserRef = usersRef.document(friendId);
+
                     friendUserRef.get().addOnCompleteListener(friendTask -> {
                         if (friendTask.isSuccessful()) {
                             DocumentSnapshot friendDocument = friendTask.getResult();
@@ -124,7 +153,7 @@ public class FriendsActivity extends AppCompatActivity implements FriendListener
         }
     };
 
-    private final EventListener<QuerySnapshot> eventListener = (value, error) -> {
+    private final EventListener<QuerySnapshot> friendsActiveStatusEventListener = (value, error) -> {
         if (error != null) {
             return;
         }
@@ -132,9 +161,6 @@ public class FriendsActivity extends AppCompatActivity implements FriendListener
         if (value != null) {
             for (DocumentChange documentChange : value.getDocumentChanges()) {
                 if (documentChange.getDocument().getId().equals(this.preferenceManager.getString(Constant.KEY_USER_ID)))
-                    continue;
-
-                if (!this.friendIDs.contains(documentChange.getDocument().getId()))
                     continue;
 
                 if (documentChange.getType() == DocumentChange.Type.MODIFIED) {
