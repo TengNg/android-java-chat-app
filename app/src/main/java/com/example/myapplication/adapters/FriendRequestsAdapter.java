@@ -1,6 +1,8 @@
 package com.example.myapplication.adapters;
 
+import android.graphics.Color;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
@@ -69,8 +71,13 @@ public class FriendRequestsAdapter extends RecyclerView.Adapter<FriendRequestsAd
         void setFriendRequestData(FriendRequest friendRequest) {
             this.binding.notificationTextView.setText(friendRequest.senderName + "✌️");
             this.binding.dateTextView.setText(friendRequest.dateTime);
-            this.binding.acceptButton.setOnClickListener(v -> friendRequestListener.onAcceptButtonClicked());
-            this.binding.declineButton.setOnClickListener(v -> friendRequestListener.onDeclineButtonClicked());
+            this.binding.acceptButton.setOnClickListener(v -> {
+                friendRequestListener.onAcceptButtonClicked(friendRequest);
+                this.binding.getRoot().setBackgroundColor(Color.parseColor("#4fcc94"));
+                this.binding.acceptButton.setVisibility(View.GONE);
+                this.binding.declineButton.setVisibility(View.GONE);
+            });
+            this.binding.declineButton.setOnClickListener(v -> friendRequestListener.onDeclineButtonClicked(friendRequest));
         }
     }
 }

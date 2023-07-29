@@ -169,28 +169,11 @@ public class UsersActivity extends AppCompatActivity implements UserListener {
 
     @Override
     public void onAddFriendButtonClicked(User user) {
-//        HashMap<String, Boolean> friendId1 = new HashMap<>();
-//        friendId1.put(user.id, true);
-//        this.db.collection(Constant.KEY_COLLECTION_USERS)
-//                .document(this.preferenceManager.getString(Constant.KEY_USER_ID))
-//                .collection(Constant.KEY_COLLECTION_USER_FRIENDS)
-//                .add(friendId1);
-//
-//        HashMap<String, Boolean> friendId2 = new HashMap<>();
-//        friendId2.put(this.preferenceManager.getString(Constant.KEY_USER_ID), true);
-//        this.db.collection(Constant.KEY_COLLECTION_USERS)
-//                .document(user.id)
-//                .collection(Constant.KEY_COLLECTION_USER_FRIENDS)
-//                .add(friendId2);
-//
-//        Toast.makeText(getApplicationContext(), "Friend added", Toast.LENGTH_SHORT).show();
-
-        // TODO: send notification to NotificationActivity & FriendsActivity
         String senderId = this.preferenceManager.getString(Constant.KEY_USER_ID);
         String senderName = this.preferenceManager.getString(Constant.KEY_NAME);
         String receiverId = user.id;
         String receiverName = user.name;
-        String friendRequestID = this.db.collection(Constant.KEY_COLLECTION_FRIEND_REQUESTS).document().getId();
+
         HashMap<String, Object> friendRequestData = new HashMap<>();
         friendRequestData.put("senderId", senderId);
         friendRequestData.put("senderName", senderName);
@@ -218,6 +201,10 @@ public class UsersActivity extends AppCompatActivity implements UserListener {
                 .addOnFailureListener(e -> {
                     this.showErrorMsg();
                 });
+
+
+        // TODO: check if other users send friend request to you
+
     }
 
     @Override

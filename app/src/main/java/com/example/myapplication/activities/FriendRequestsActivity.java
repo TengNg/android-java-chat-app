@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import com.example.myapplication.adapters.FriendRequestsAdapter;
 import com.example.myapplication.databinding.ActivityFriendRequestsBinding;
@@ -12,6 +13,7 @@ import com.example.myapplication.listeners.FriendRequestListener;
 import com.example.myapplication.models.FriendRequest;
 import com.example.myapplication.utilities.Constant;
 import com.example.myapplication.utilities.PreferenceManager;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -19,8 +21,10 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 public class FriendRequestsActivity extends AppCompatActivity implements FriendRequestListener {
     private ActivityFriendRequestsBinding binding;
@@ -39,21 +43,16 @@ public class FriendRequestsActivity extends AppCompatActivity implements FriendR
         this.getFriendRequests();
     }
 
-
-//    private void initialize() {
-//        this.notifications = new ArrayList<>();
-//        this.preferenceManager = new PreferenceManager(getApplicationContext());
-//        this.notificationsAdapter = new NotificationsAdapter(notifications, this);
-//        this.db = FirebaseFirestore.getInstance();
-//        this.binding.notificationsRecyclerView.setAdapter(notificationsAdapter);
-//    }
-
     private void initialize() {
         this.preferenceManager = new PreferenceManager(getApplicationContext());
         this.db = FirebaseFirestore.getInstance();
         this.friendRequests = new ArrayList<>();
         this.friendRequestsAdapter = new FriendRequestsAdapter(friendRequests, this);
         this.binding.friendRequestsRecyclerView.setAdapter(this.friendRequestsAdapter);
+    }
+
+    private void showToast(String msg) {
+        Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
     }
 
     private void handleBackPressed() {
@@ -71,6 +70,7 @@ public class FriendRequestsActivity extends AppCompatActivity implements FriendR
                         if (querySnapshot != null) {
                             for (DocumentSnapshot document : querySnapshot.getDocuments()) {
                                 FriendRequest friendRequest = new FriendRequest();
+                                friendRequest.id = document.getId();
                                 friendRequest.status = document.getString(Constant.KEY_FRIEND_REQUEST_STATUS);
                                 friendRequest.receiverId = document.getString(Constant.KEY_RECEIVER_ID);
                                 friendRequest.receiverName = document.getString(Constant.KEY_RECEIVER_NAME);
@@ -80,11 +80,7 @@ public class FriendRequestsActivity extends AppCompatActivity implements FriendR
                                 friendRequest.dateTime = getSimpleMessageDateTime(friendRequest.dateObject);
                                 this.friendRequests.add(friendRequest);
                                 this.friendRequestsAdapter.notifyDataSetChanged();
-
-                                Log.d("TestingResult", document.getData().toString());
                             }
-
-//                            Log.d("TestingResult", pendingRequests.toString());
                         }
                         this.binding.progressCircular.setVisibility(View.GONE);
                     } else {
@@ -98,12 +94,34 @@ public class FriendRequestsActivity extends AppCompatActivity implements FriendR
     }
 
     @Override
-    public void onAcceptButtonClicked() {
+    public void onAcceptButtonClicked(FriendRequest friendRequest) {
+        String senderId = friendRequest.senderId;
+        String receiverId = friendRequest.receiverId;
 
+        HashMap<String, Boolean> friendId1 = new HashMap<>();
+        friendId1.put(receiverId, true);
+        this.db.collection(Constant.KEY_COLLECTION_USERS)
+                .document(senderId)
+                .collection(Constant.KEY_COLLECTION_USER_FRIENDS)
+                .add(friendId1);
+
+        HashMap<String, Boolean> friendId2 = new HashMap<>();
+        friendId2.put(senderId, true);
+        this.db.collection(Constant.KEY_COLLECTION_USERS)
+                .document(receiverId)
+                .collection(Constant.KEY_COLLECTION_USER_FRIENDS)
+                .add(friendId2);
+
+        DocumentReference docRef = this.db.collection(Constant.KEY_COLLECTION_FRIEND_REQUESTS).document(friendRequest.id);
+        Map<String, Object> updateData = new HashMap<>();
+        updateData.put(Constant.KEY_FRIEND_REQUEST_STATUS, "accepted");
+        docRef.update(updateData);
+
+        this.showToast("Friend request accepted");
     }
 
     @Override
-    public void onDeclineButtonClicked() {
+    public void onDeclineButtonClicked(FriendRequest friendReques) {
 
     }
 }
