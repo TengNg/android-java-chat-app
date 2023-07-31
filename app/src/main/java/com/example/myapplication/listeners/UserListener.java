@@ -5,7 +5,5 @@ import com.example.myapplication.models.User;
 public interface UserListener {
     void onUserClicked(User user);
 
-    void onAddFriendButtonClicked(User user);
-
     void onMessageButtonClicked(User user);
 }
