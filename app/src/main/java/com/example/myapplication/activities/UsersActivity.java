@@ -168,46 +168,6 @@ public class UsersActivity extends AppCompatActivity implements UserListener {
     }
 
     @Override
-    public void onAddFriendButtonClicked(User user) {
-        String senderId = this.preferenceManager.getString(Constant.KEY_USER_ID);
-        String senderName = this.preferenceManager.getString(Constant.KEY_NAME);
-        String receiverId = user.id;
-        String receiverName = user.name;
-
-        HashMap<String, Object> friendRequestData = new HashMap<>();
-        friendRequestData.put("senderId", senderId);
-        friendRequestData.put("senderName", senderName);
-        friendRequestData.put("receiverId", receiverId);
-        friendRequestData.put("receiverName", receiverName);
-        friendRequestData.put("status", "pending");
-        friendRequestData.put("timestamp", new Date());
-
-        this.db.collection(Constant.KEY_COLLECTION_FRIEND_REQUESTS)
-                .whereEqualTo(Constant.KEY_SENDER_ID, senderId)
-                .whereEqualTo(Constant.KEY_RECEIVER_ID, receiverId)
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        boolean isSent = !task.getResult().isEmpty();
-                        if (isSent) {
-                            this.showToast("You have already sent friend request to this user");
-                        } else {
-                            DocumentReference newNotificationRef = db.collection(Constant.KEY_COLLECTION_FRIEND_REQUESTS).document();
-                            newNotificationRef.set(friendRequestData);
-                            this.showToast("Friend request sent");
-                        }
-                    }
-                })
-                .addOnFailureListener(e -> {
-                    this.showErrorMsg();
-                });
-
-
-        // TODO: check if other users send friend request to you
-
-    }
-
-    @Override
     public void onMessageButtonClicked(User user) {
         Intent intent = new Intent(getApplicationContext(), ChatActivity.class);
         intent.putExtra(Constant.KEY_USER, user);

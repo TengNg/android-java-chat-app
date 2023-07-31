@@ -24,13 +24,11 @@
         android:layout_width="377dp"
         android:layout_height="278dp"
         android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.47"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/usernameTextView"
         android:padding="16dp"
-        >
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.529"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/relativeLayout">
 
         <TextView
             android:id="@+id/userEmailTextView"
@@ -70,17 +68,6 @@
     />
 
     <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/addFriendImage"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginStart="8dp"
-        android:background="@drawable/ic_add_friend"
-        app:layout_constraintBottom_toBottomOf="@+id/messageImage"
-        app:layout_constraintStart_toEndOf="@+id/messageImage"
-        app:layout_constraintTop_toTopOf="@+id/messageImage"
-    />
-
-    <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/messageImage"
         android:layout_width="30dp"
         android:layout_height="30dp"
@@ -90,5 +77,78 @@
         app:layout_constraintStart_toEndOf="@+id/usernameTextView"
         app:layout_constraintTop_toTopOf="@+id/usernameTextView"
     />
+
+    <TextView
+        android:id="@+id/friendRequestStatusTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:textSize="16dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/usernameTextView" />
+
+    <RelativeLayout
+        android:id="@+id/relativeLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/friendRequestStatusTextView">
+
+        <Button
+            android:id="@+id/addFriendButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:text="Add Friend"
+            android:visibility="invisible" />
+
+        <Button
+            android:id="@+id/unfriendButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:text="unfriend"
+            android:visibility="invisible" />
+
+        <Button
+            android:id="@+id/cancelFriendRequestButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:visibility="invisible"
+            android:text="Cancel friend request" />
+
+        <LinearLayout
+            android:id="@+id/receivedFriendRequestButtonLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:visibility="invisible">
+
+            <Button
+                android:id="@+id/acceptFriendRequestFromUserButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:text="Accept" />
+
+            <Button
+                android:id="@+id/declineFriendRequestFromUserButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="Decline" />
+
+
+        </LinearLayout>
+    </RelativeLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

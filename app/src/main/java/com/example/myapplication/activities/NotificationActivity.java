@@ -57,7 +57,6 @@ public class NotificationActivity extends AppCompatActivity implements Notificat
     private void getNotifications() {
         this.db.collection(Constant.KEY_COLLECTION_FRIEND_REQUESTS)
                 .whereEqualTo(Constant.KEY_RECEIVER_ID, this.preferenceManager.getString(Constant.KEY_USER_ID))
-                .whereEqualTo(Constant.KEY_FRIEND_REQUEST_STATUS, "pending")
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {

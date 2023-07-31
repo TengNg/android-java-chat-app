@@ -94,16 +94,4 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/activeStatusImage"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:background="@drawable/ic_active"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="@+id/usernameTextView"
-        app:layout_constraintStart_toEndOf="@+id/usernameTextView"
-        app:layout_constraintTop_toTopOf="@+id/usernameTextView"
-        />
-
 </androidx.constraintlayout.widget.ConstraintLayout>

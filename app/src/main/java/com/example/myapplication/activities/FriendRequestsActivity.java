@@ -62,7 +62,6 @@ public class FriendRequestsActivity extends AppCompatActivity implements FriendR
     private void getFriendRequests() {
         this.db.collection(Constant.KEY_COLLECTION_FRIEND_REQUESTS)
                 .whereEqualTo(Constant.KEY_RECEIVER_ID, this.preferenceManager.getString(Constant.KEY_USER_ID))
-                .whereEqualTo(Constant.KEY_FRIEND_REQUEST_STATUS, "pending")
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
@@ -121,7 +120,29 @@ public class FriendRequestsActivity extends AppCompatActivity implements FriendR
     }
 
     @Override
-    public void onDeclineButtonClicked(FriendRequest friendReques) {
+    public void onDeclineButtonClicked(FriendRequest friendRequest) {
+        String senderId = friendRequest.senderId;
+        String receiverId = friendRequest.receiverId;
 
+        HashMap<String, Boolean> friendId1 = new HashMap<>();
+        friendId1.put(receiverId, true);
+        this.db.collection(Constant.KEY_COLLECTION_USERS)
+                .document(senderId)
+                .collection(Constant.KEY_COLLECTION_USER_FRIENDS)
+                .add(friendId1);
+
+        HashMap<String, Boolean> friendId2 = new HashMap<>();
+        friendId2.put(senderId, true);
+        this.db.collection(Constant.KEY_COLLECTION_USERS)
+                .document(receiverId)
+                .collection(Constant.KEY_COLLECTION_USER_FRIENDS)
+                .add(friendId2);
+
+        DocumentReference docRef = this.db.collection(Constant.KEY_COLLECTION_FRIEND_REQUESTS).document(friendRequest.id);
+        Map<String, Object> updateData = new HashMap<>();
+        updateData.put(Constant.KEY_FRIEND_REQUEST_STATUS, "declined");
+        docRef.update(updateData);
+
+        this.showToast("Friend request declined");
     }
 }

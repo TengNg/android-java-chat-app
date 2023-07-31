@@ -100,6 +100,7 @@ public class SignUpActivity extends AppCompatActivity {
         user.put(Constant.KEY_NAME, binding.signUpUsernameInput.getText().toString());
         user.put(Constant.KEY_EMAIL, binding.signUpEmailInput.getText().toString());
         user.put(Constant.KEY_PASSWORD, binding.signUpPasswordInput.getText().toString());
+//        user.put(Constant.KEY_IMAGE, this.encodedImage);
 
         if (this.binding.maleRadioButton.isChecked()) {
             user.put(Constant.KEY_GENDER, this.binding.maleRadioButton.getText().toString());
@@ -121,9 +122,10 @@ public class SignUpActivity extends AppCompatActivity {
                             this.showToast("Loading...");
                             DocumentReference newUserRef = db.collection(Constant.KEY_COLLECTION_USERS).document();
                             newUserRef.set(user);
-                            preferenceManager.putBoolean(Constant.KEY_IS_SIGNED_IN, true);
-                            preferenceManager.putString(Constant.KEY_USER_ID, newUserRef.getId());
-                            preferenceManager.putString(Constant.KEY_NAME, binding.signUpUsernameInput.getText().toString());
+                            this.preferenceManager.putBoolean(Constant.KEY_IS_SIGNED_IN, true);
+                            this.preferenceManager.putString(Constant.KEY_USER_ID, newUserRef.getId());
+                            this.preferenceManager.putString(Constant.KEY_NAME, binding.signUpUsernameInput.getText().toString());
+                            this.preferenceManager.putString(Constant.KEY_IMAGE, this.encodedImage);
                             Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                             startActivity(intent);

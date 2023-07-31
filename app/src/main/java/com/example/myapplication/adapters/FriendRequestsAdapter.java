@@ -69,15 +69,47 @@ public class FriendRequestsAdapter extends RecyclerView.Adapter<FriendRequestsAd
         }
 
         void setFriendRequestData(FriendRequest friendRequest) {
+            String status = friendRequest.status;
+
             this.binding.notificationTextView.setText(friendRequest.senderName + "✌️");
             this.binding.dateTextView.setText(friendRequest.dateTime);
-            this.binding.acceptButton.setOnClickListener(v -> {
-                friendRequestListener.onAcceptButtonClicked(friendRequest);
-                this.binding.getRoot().setBackgroundColor(Color.parseColor("#4fcc94"));
-                this.binding.acceptButton.setVisibility(View.GONE);
-                this.binding.declineButton.setVisibility(View.GONE);
-            });
-            this.binding.declineButton.setOnClickListener(v -> friendRequestListener.onDeclineButtonClicked(friendRequest));
+
+            switch (status) {
+                case "pending":
+                    this.binding.acceptButton.setOnClickListener(v -> this.handleAcceptFriendRequest(friendRequest));
+                    this.binding.declineButton.setOnClickListener(v -> this.handleDeclineFriendRequest(friendRequest));
+                    break;
+                case "accepted":
+                    this.setAcceptedFriendRequest();
+                    break;
+                case "declined":
+                    this.setDeclinedFriendRequest();
+                    break;
+            }
+
         }
+
+        void setAcceptedFriendRequest() {
+            this.binding.getRoot().setBackgroundColor(Color.parseColor("#aff7b6"));
+            this.binding.acceptButton.setVisibility(View.GONE);
+            this.binding.declineButton.setVisibility(View.GONE);
+        }
+
+        void setDeclinedFriendRequest() {
+            this.binding.getRoot().setBackgroundColor(Color.parseColor("f48e77"));
+            this.binding.acceptButton.setVisibility(View.GONE);
+            this.binding.declineButton.setVisibility(View.GONE);
+        }
+
+        void handleAcceptFriendRequest(FriendRequest friendRequest) {
+            friendRequestListener.onAcceptButtonClicked(friendRequest);
+            this.setAcceptedFriendRequest();
+        }
+
+        void handleDeclineFriendRequest(FriendRequest friendRequest) {
+            friendRequestListener.onDeclineButtonClicked(friendRequest);
+            this.setDeclinedFriendRequest();
+        }
+
     }
 }

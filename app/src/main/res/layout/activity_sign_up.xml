@@ -46,6 +46,8 @@
                     android:id="@+id/profileImage"
                     android:layout_width="100dp"
                     android:layout_height="100dp"
+                    android:scaleType="centerCrop"
+                    app:riv_oval="true"
                     android:background="@drawable/bg_image" />
                 <TextView
                     android:id="@+id/addImageTextView"
