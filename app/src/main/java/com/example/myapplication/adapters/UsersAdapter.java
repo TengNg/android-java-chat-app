@@ -54,7 +54,6 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UserViewHold
             this.binding.emailTextView.setText(user.email);
             this.binding.nameTextView.setText(user.name);
             this.binding.getRoot().setOnClickListener(v -> userListener.onUserClicked(user));
-            this.binding.addFriendImage.setOnClickListener(v -> userListener.onAddFriendButtonClicked(user));
             this.binding.messageImage.setOnClickListener(v -> userListener.onMessageButtonClicked(user));
         }
     }
