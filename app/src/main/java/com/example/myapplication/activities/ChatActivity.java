@@ -2,12 +2,14 @@ package com.example.myapplication.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 
 import com.example.myapplication.adapters.ChatAdapter;
 import com.example.myapplication.databinding.ActivityChatBinding;
+import com.example.myapplication.databinding.ItemContainerUserBinding;
 import com.example.myapplication.models.ChatMessage;
 import com.example.myapplication.models.User;
 import com.example.myapplication.utilities.Constant;
@@ -39,12 +41,12 @@ public class ChatActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         this.binding = ActivityChatBinding.inflate(getLayoutInflater());
         setContentView(this.binding.getRoot());
+        initialize();
         getReceiverInfo();
         handleBackPressed();
-        initialize();
         handleSendMessage();
+        handleShowUserInfo();
         listenMessages();
-        listenFriendActiveStatus();
     }
 
     private void initialize() {
@@ -118,46 +120,23 @@ public class ChatActivity extends AppCompatActivity {
         this.binding.progressCircular.setVisibility(View.GONE);
     };
 
+    private void getReceiverInfo() {
+        this.receiver = (User) getIntent().getSerializableExtra(Constant.KEY_USER);
+        this.binding.usernameTextView.setText(this.receiver.name);
 
-    private void listenFriendActiveStatus() {
-        DocumentReference docRef = db.collection(Constant.KEY_COLLECTION_USERS)
-                .document(((User) getIntent().getSerializableExtra(Constant.KEY_USER)).id);
-
-        docRef.addSnapshotListener((snapshot, e) -> {
-            if (e != null) {
-                Log.e("Firestore", "Error listening for document changes.", e);
-                return;
-            }
-
-            if (snapshot != null && snapshot.exists()) {
-                String token = snapshot.getString(Constant.KEY_FCM_TOKEN);
-
-                if (token != null) {
-                    this.binding.activeStatusImage.setVisibility(View.VISIBLE);
-                } else {
-                    this.binding.activeStatusImage.setVisibility(View.INVISIBLE);
-                }
-
-            } else {
-                // The document has been deleted.
-                Log.d("Firestore", "Document does not exist.");
-            }
+        this.binding.imageInfo.setOnClickListener(v -> {
+            Intent intent = new Intent(getApplicationContext(), UserInfoActivity.class);
+            intent.putExtra(Constant.KEY_USER, this.receiver);
+            startActivity(intent);
         });
     }
 
-
-    private void getReceiverInfo() {
-        this.receiver = (User) getIntent().getSerializableExtra(Constant.KEY_USER);
-
-        // Set receiver name
-        this.binding.usernameTextView.setText(this.receiver.name);
-
-        // Set receiver active status
-        if (this.receiver.token != null) {
-            this.binding.activeStatusImage.setVisibility(View.VISIBLE);
-        } else {
-            this.binding.activeStatusImage.setVisibility(View.GONE);
-        }
+    private void handleShowUserInfo() {
+        this.binding.imageInfo.setOnClickListener(v -> {
+            Intent intent = new Intent(getApplicationContext(), UserInfoActivity.class);
+            intent.putExtra(Constant.KEY_USER, this.receiver);
+            startActivity(intent);
+        });
     }
 
     private void handleBackPressed() {
