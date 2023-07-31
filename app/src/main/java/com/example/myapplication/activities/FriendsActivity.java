@@ -46,11 +46,8 @@ public class FriendsActivity extends AppCompatActivity implements FriendListener
         this.handleBackPressed();
         this.handleShowFriendRequests();
         this.initialize();
-//        getFriend();
         this.listenFriends();
-        this.listenActiveStatus();
         this.listenFriendRequests();
-//        this.getFriendRequestCount();
     }
 
     private void initialize() {
@@ -74,10 +71,10 @@ public class FriendsActivity extends AppCompatActivity implements FriendListener
         });
     }
 
-    private void listenActiveStatus() {
-        db.collection(Constant.KEY_COLLECTION_USERS)
-                .addSnapshotListener(friendsActiveStatusEventListener);
-    }
+//    private void listenActiveStatus() {
+//        db.collection(Constant.KEY_COLLECTION_USERS)
+//                .addSnapshotListener(friendsActiveStatusEventListener);
+//    }
 
     private void listenFriends() {
         db.collection(Constant.KEY_COLLECTION_USERS)
@@ -146,6 +143,8 @@ public class FriendsActivity extends AppCompatActivity implements FriendListener
                         }
                     });
                 }
+
+                this.binding.progressCircular.setVisibility(View.GONE);
             }
 
         } else {
@@ -153,33 +152,33 @@ public class FriendsActivity extends AppCompatActivity implements FriendListener
         }
     };
 
-    private final EventListener<QuerySnapshot> friendsActiveStatusEventListener = (value, error) -> {
-        if (error != null) {
-            return;
-        }
-
-        if (value != null) {
-            for (DocumentChange documentChange : value.getDocumentChanges()) {
-                if (documentChange.getDocument().getId().equals(this.preferenceManager.getString(Constant.KEY_USER_ID)))
-                    continue;
-
-                if (documentChange.getType() == DocumentChange.Type.MODIFIED) {
-                    String changedModelEmail = documentChange.getDocument().getString(Constant.KEY_EMAIL);
-                    for (int i = 0; i < this.users.size(); i++) {
-                        if (this.users.get(i).email.equals(changedModelEmail)) {
-                            this.users.get(i).token = documentChange.getDocument().getString(Constant.KEY_FCM_TOKEN);
-                            this.friendsAdapter.notifyItemChanged(i);
-                        }
-                    }
-                }
-
-            }
-        } else {
-            this.showErrorMsg();
-        }
-
-        this.binding.progressCircular.setVisibility(View.GONE);
-    };
+//    private final EventListener<QuerySnapshot> friendsActiveStatusEventListener = (value, error) -> {
+//        if (error != null) {
+//            return;
+//        }
+//
+//        if (value != null) {
+//            for (DocumentChange documentChange : value.getDocumentChanges()) {
+//                if (documentChange.getDocument().getId().equals(this.preferenceManager.getString(Constant.KEY_USER_ID)))
+//                    continue;
+//
+//                if (documentChange.getType() == DocumentChange.Type.MODIFIED) {
+//                    String changedModelEmail = documentChange.getDocument().getString(Constant.KEY_EMAIL);
+//                    for (int i = 0; i < this.users.size(); i++) {
+//                        if (this.users.get(i).email.equals(changedModelEmail)) {
+//                            this.users.get(i).token = documentChange.getDocument().getString(Constant.KEY_FCM_TOKEN);
+//                            this.friendsAdapter.notifyItemChanged(i);
+//                        }
+//                    }
+//                }
+//
+//            }
+//        } else {
+//            this.showErrorMsg();
+//        }
+//
+//        this.binding.progressCircular.setVisibility(View.GONE);
+//    };
 
 //    private void getFriends() {
 //        String specificUserID = this.preferenceManager.getString(Constant.KEY_USER_ID);
