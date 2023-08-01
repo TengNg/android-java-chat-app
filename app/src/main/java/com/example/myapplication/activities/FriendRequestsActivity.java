@@ -102,14 +102,16 @@ public class FriendRequestsActivity extends AppCompatActivity implements FriendR
         this.db.collection(Constant.KEY_COLLECTION_USERS)
                 .document(senderId)
                 .collection(Constant.KEY_COLLECTION_USER_FRIENDS)
-                .add(friendId1);
+                .document(receiverId)
+                .set(friendId1);
 
         HashMap<String, Boolean> friendId2 = new HashMap<>();
         friendId2.put(senderId, true);
         this.db.collection(Constant.KEY_COLLECTION_USERS)
                 .document(receiverId)
                 .collection(Constant.KEY_COLLECTION_USER_FRIENDS)
-                .add(friendId2);
+                .document(senderId)
+                .set(friendId2);
 
         DocumentReference docRef = this.db.collection(Constant.KEY_COLLECTION_FRIEND_REQUESTS).document(friendRequest.id);
         Map<String, Object> updateData = new HashMap<>();

@@ -19,6 +19,7 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -51,6 +52,7 @@ public class UserInfoActivity extends AppCompatActivity {
         this.handleUnfriend();
         this.handleUpdateFriendRequestStatus(this.binding.acceptFriendRequestFromUserButton, "accepted");
         this.handleUpdateFriendRequestStatus(this.binding.declineFriendRequestFromUserButton, "declined");
+        this.handleRemovePendingSentFriendRequest();
     }
 
     private void initialize() {
@@ -143,85 +145,103 @@ public class UserInfoActivity extends AppCompatActivity {
             String senderId = this.preferenceManager.getString(Constant.KEY_USER_ID);
             String receiverId = ((User) getIntent().getSerializableExtra(Constant.KEY_USER)).id;
 
-            HashMap<String, Boolean> friendId1 = new HashMap<>();
-            friendId1.put(receiverId, true);
-            this.db.collection(Constant.KEY_COLLECTION_USERS)
-                    .document(senderId)
-                    .collection(Constant.KEY_COLLECTION_USER_FRIENDS)
-                    .add(friendId1);
-
-            HashMap<String, Boolean> friendId2 = new HashMap<>();
-            friendId2.put(senderId, true);
-            this.db.collection(Constant.KEY_COLLECTION_USERS)
-                    .document(receiverId)
-                    .collection(Constant.KEY_COLLECTION_USER_FRIENDS)
-                    .add(friendId2);
-
             CollectionReference friendRequestsRef = db.collection(Constant.KEY_COLLECTION_FRIEND_REQUESTS);
 
-            friendRequestsRef.whereEqualTo("senderId", receiverId)
-                    .whereEqualTo("receiverId", senderId)
+            friendRequestsRef
+                    .whereEqualTo(Constant.KEY_SENDER_ID, receiverId)
+                    .whereEqualTo(Constant.KEY_RECEIVER_ID, senderId)
+                    .whereEqualTo(Constant.KEY_FRIEND_REQUEST_STATUS, "pending")
                     .limit(1)
                     .get()
                     .addOnSuccessListener(querySnapshot -> {
+                        this.binding.acceptFriendRequestFromUserButton.setVisibility(View.GONE);
+                        this.binding.declineFriendRequestFromUserButton.setVisibility(View.GONE);
+
                         if (!querySnapshot.isEmpty()) {
                             String documentId = querySnapshot.getDocuments().get(0).getId();
                             friendRequestsRef.document(documentId).update("status", status)
                                     .addOnSuccessListener(aVoid -> {
-                                        this.binding.friendRequestStatusTextView.setText("Friend✅");
-                                        this.binding.acceptFriendRequestFromUserButton.setVisibility(View.INVISIBLE);
-                                        this.binding.declineFriendRequestFromUserButton.setVisibility(View.INVISIBLE);
+                                        if (status.equals("accepted")) {
+                                            HashMap<String, Boolean> friendId1 = new HashMap<>();
+                                            friendId1.put(receiverId, true);
+                                            this.db.collection(Constant.KEY_COLLECTION_USERS)
+                                                    .document(senderId)
+                                                    .collection(Constant.KEY_COLLECTION_USER_FRIENDS)
+                                                    .document(receiverId)
+                                                    .set(friendId1);
+
+                                            HashMap<String, Boolean> friendId2 = new HashMap<>();
+                                            friendId2.put(senderId, true);
+                                            this.db.collection(Constant.KEY_COLLECTION_USERS)
+                                                    .document(receiverId)
+                                                    .collection(Constant.KEY_COLLECTION_USER_FRIENDS)
+                                                    .document(senderId)
+                                                    .set(friendId2);
+
+                                            this.binding.friendRequestStatusTextView.setText("Friend✅");
+                                            this.onFriendRequestStatus(FriendRequestStatus.FRIENDS);
+                                        } else if (status.equals("declined")){
+                                            this.onFriendRequestStatus(FriendRequestStatus.NOT_FOUND);
+                                        }
+                                        this.showToast("Friend request " + status);
                                     })
                                     .addOnFailureListener(e -> {
-                                        Log.d("Error", "Friend request document not found.");
+                                        this.onFriendRequestStatus(FriendRequestStatus.NOT_FOUND);
+                                        this.showToast("Friend request not found");
                                     });
+
                         } else {
-                            Log.d("Error", "Friend request document not found.");
+                            this.onFriendRequestStatus(FriendRequestStatus.NOT_FOUND);
+                            this.showToast("Friend request not found");
                         }
                     })
                     .addOnFailureListener(e -> {
                         Log.d("Error", "Error when retrieving friend request");
                     });
+        });
+    }
 
-            this.showToast("Friend request accepted");
+    private void handleRemovePendingSentFriendRequest() {
+        this.binding.cancelFriendRequestButton.setOnClickListener(v -> {
+            User receiver = ((User) getIntent().getSerializableExtra(Constant.KEY_USER));
+            String receiverId = receiver.id;
+            String senderId = this.preferenceManager.getString(Constant.KEY_USER_ID);
 
-            button.setVisibility(View.GONE);
-            if (status.equals("accepted")) {
-                this.onFriendRequestStatus(FriendRequestStatus.FRIENDS);
-            } else if (status.equals("declined")){
-                this.onFriendRequestStatus(FriendRequestStatus.NOT_FOUND);
-            }
+            this.db.collection(Constant.KEY_COLLECTION_FRIEND_REQUESTS)
+                    .whereEqualTo(Constant.KEY_SENDER_ID, senderId)
+                    .whereEqualTo(Constant.KEY_RECEIVER_ID, receiverId)
+                    .whereEqualTo(Constant.KEY_FRIEND_REQUEST_STATUS, "pending")
+                    .get()
+                    .addOnSuccessListener(querySnapshot -> {
+                        if (!querySnapshot.isEmpty()) {
+                            String documentId = querySnapshot.getDocuments().get(0).getId();
+                            this.db.collection(Constant.KEY_COLLECTION_FRIEND_REQUESTS).document(documentId).delete()
+                                    .addOnSuccessListener(aVoid -> this.showToast("Friend request removed"))
+                                    .addOnFailureListener(e -> this.showToast("Cannot remove friend request"));
+
+                            this.binding.cancelFriendRequestButton.setVisibility(View.GONE);
+                            this.onFriendRequestStatus(FriendRequestStatus.NOT_FOUND);
+
+                        } else {
+                            this.showToast("Cannot remove friend request");
+                        }
+                    })
+                    .addOnFailureListener(e -> {
+                        this.showToast("Cannot remove friend request");
+                    });
         });
     }
 
     private void handleUnfriend() {
-        User currentUser = ((User) getIntent().getSerializableExtra(Constant.KEY_USER));
-        String id1 = currentUser.id;
-        String id2 = this.preferenceManager.getString(Constant.KEY_USER_ID);
+        User receiver = ((User) getIntent().getSerializableExtra(Constant.KEY_USER));
+        String user1Id = receiver.id;
+        String user2Id = this.preferenceManager.getString(Constant.KEY_USER_ID);
+
+        DocumentReference user1Ref = db.collection(Constant.KEY_COLLECTION_USERS).document(user1Id);
+        DocumentReference user2Ref = db.collection(Constant.KEY_COLLECTION_USERS).document(user2Id);
 
         this.binding.unfriendButton.setOnClickListener(v -> {
-            DocumentReference dr1 = db.collection(Constant.KEY_COLLECTION_USERS)
-                    .document(id2)
-                    .collection(Constant.KEY_COLLECTION_USER_FRIENDS)
-                    .document(id1);
 
-            HashMap<String, Object> newData1 = new HashMap<>();
-            newData1.put(id1, FieldValue.delete());
-            dr1.update(newData1);
-
-            DocumentReference dr2 = db.collection(Constant.KEY_COLLECTION_USERS)
-                    .document(id1)
-                    .collection(Constant.KEY_COLLECTION_USER_FRIENDS)
-                    .document(id2);
-
-            HashMap<String, Object> newData2 = new HashMap<>();
-            newData2.put(id2, FieldValue.delete());
-            dr2.update(newData2);
-
-            this.showToast("Unfriend " + currentUser.name);
-
-            this.binding.unfriendButton.setVisibility(View.GONE);
-            this.onFriendRequestStatus(FriendRequestStatus.NOT_FOUND);
         });
     }
 
