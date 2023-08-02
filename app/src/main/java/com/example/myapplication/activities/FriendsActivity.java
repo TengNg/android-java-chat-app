@@ -4,6 +4,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
@@ -47,7 +49,7 @@ public class FriendsActivity extends AppCompatActivity implements FriendListener
         this.handleShowFriendRequests();
         this.initialize();
         this.listenFriends();
-        this.listenFriendRequests();
+        this.listenFriendRequestsCount();
     }
 
     private void initialize() {
@@ -71,11 +73,6 @@ public class FriendsActivity extends AppCompatActivity implements FriendListener
         });
     }
 
-//    private void listenActiveStatus() {
-//        db.collection(Constant.KEY_COLLECTION_USERS)
-//                .addSnapshotListener(friendsActiveStatusEventListener);
-//    }
-
     private void listenFriends() {
         db.collection(Constant.KEY_COLLECTION_USERS)
                 .document(this.preferenceManager.getString(Constant.KEY_USER_ID))
@@ -83,14 +80,14 @@ public class FriendsActivity extends AppCompatActivity implements FriendListener
                 .addSnapshotListener(friendsEventListener);
     }
 
-    private void listenFriendRequests() {
+    private void listenFriendRequestsCount() {
         db.collection(Constant.KEY_COLLECTION_FRIEND_REQUESTS)
                 .whereEqualTo(Constant.KEY_RECEIVER_ID, this.preferenceManager.getString(Constant.KEY_USER_ID))
                 .whereEqualTo(Constant.KEY_FRIEND_REQUEST_STATUS, "pending")
-                .addSnapshotListener(friendRequestsEventListener);
+                .addSnapshotListener(friendRequestsCountEventListener);
     }
 
-    private final EventListener<QuerySnapshot> friendRequestsEventListener = (value, error) -> {
+    private final EventListener<QuerySnapshot> friendRequestsCountEventListener = (value, error) -> {
         if (error != null) {
             return;
         }
@@ -114,7 +111,7 @@ public class FriendsActivity extends AppCompatActivity implements FriendListener
             CollectionReference usersRef = db.collection(Constant.KEY_COLLECTION_USERS);
 
             for (DocumentChange documentChange : value.getDocumentChanges()) {
-                String friendId = documentChange.getDocument().getData().keySet().iterator().next(); // get only first field in a document
+                String friendId = documentChange.getDocument().getId();
                 if (documentChange.getType() == DocumentChange.Type.ADDED) {
 
                     DocumentReference friendUserRef = usersRef.document(friendId);
@@ -134,7 +131,35 @@ public class FriendsActivity extends AppCompatActivity implements FriendListener
                                 user.id = friendTask.getResult().getId();
 
                                 this.users.add(user);
-                                this.friendsAdapter.notifyDataSetChanged();
+
+                                if (this.users.size() > 0) {
+                                    friendsAdapter.updateList(users);
+                                    this.binding.searchInput.addTextChangedListener(new TextWatcher() {
+                                        @Override
+                                        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+
+                                        @Override
+                                        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+
+                                        @Override
+                                        public void afterTextChanged(Editable editable) {
+                                            if (editable.length() == 0) {
+                                                friendsAdapter.updateList(users);
+                                                return;
+                                            }
+
+                                            List<User> filteredList = new ArrayList<>();
+                                            for (User user : users) {
+                                                if (user.name.contains(editable.toString())) {
+                                                    filteredList.add(user);
+                                                }
+                                            }
+
+                                            friendsAdapter.updateList(filteredList);
+
+                                        }
+                                    });
+                                }
                             } else {
                                 Log.d("FriendInfo", "Friend document does not exist");
                             }
@@ -152,93 +177,16 @@ public class FriendsActivity extends AppCompatActivity implements FriendListener
         }
     };
 
-//    private final EventListener<QuerySnapshot> friendsActiveStatusEventListener = (value, error) -> {
-//        if (error != null) {
-//            return;
-//        }
-//
-//        if (value != null) {
-//            for (DocumentChange documentChange : value.getDocumentChanges()) {
-//                if (documentChange.getDocument().getId().equals(this.preferenceManager.getString(Constant.KEY_USER_ID)))
-//                    continue;
-//
-//                if (documentChange.getType() == DocumentChange.Type.MODIFIED) {
-//                    String changedModelEmail = documentChange.getDocument().getString(Constant.KEY_EMAIL);
-//                    for (int i = 0; i < this.users.size(); i++) {
-//                        if (this.users.get(i).email.equals(changedModelEmail)) {
-//                            this.users.get(i).token = documentChange.getDocument().getString(Constant.KEY_FCM_TOKEN);
-//                            this.friendsAdapter.notifyItemChanged(i);
-//                        }
-//                    }
-//                }
-//
-//            }
-//        } else {
-//            this.showErrorMsg();
-//        }
-//
-//        this.binding.progressCircular.setVisibility(View.GONE);
-//    };
-
-//    private void getFriends() {
-//        String specificUserID = this.preferenceManager.getString(Constant.KEY_USER_ID);
-//        CollectionReference usersRef = db.collection(Constant.KEY_COLLECTION_USERS);
-//        CollectionReference specificUserFriendsRef = db.collection(Constant.KEY_COLLECTION_USERS).document(specificUserID).collection(Constant.KEY_COLLECTION_USER_FRIENDS);
-//
-//        specificUserFriendsRef.get().addOnCompleteListener(task -> {
-//            if (task.isSuccessful()) {
-//                for (QueryDocumentSnapshot document : task.getResult()) {
-//                    Map<String, Object> map = document.getData();
-//
-//                    if (map == null) continue;
-//
-//                    // get all friend ids
-//                    for (Map.Entry<String, Object> entry : map.entrySet()) {
-//                        this.friendIDs.add(entry.getKey());
-//                    }
-//                }
-//
-//                // > iterative through friend ids
-//                // > get friend info (user details)
-//                // > add to friendsAdapter
-//                for (String friendID : this.friendIDs) {
-//                    DocumentReference friendUserRef = usersRef.document(friendID);
-//                    friendUserRef.get().addOnCompleteListener(friendTask -> {
-//                        if (friendTask.isSuccessful()) {
-//                            DocumentSnapshot friendDocument = friendTask.getResult();
-//                            if (friendDocument.exists()) {
-//                                String friendUsername = friendDocument.getString(Constant.KEY_NAME);
-//                                String friendEmail = friendDocument.getString(Constant.KEY_EMAIL);
-//                                String friendToken = friendDocument.getString(Constant.KEY_FCM_TOKEN);
-//
-//                                User user = new User();
-//                                user.name = friendUsername;
-//                                user.email = friendEmail;
-//                                user.token = friendToken;
-//                                user.id = friendTask.getResult().getId();
-//
-//                                this.users.add(user);
-//                                this.friendsAdapter.notifyDataSetChanged();
-//                            } else {
-//                                Log.d("FriendInfo", "Friend document does not exist");
-//                            }
-//                        } else {
-//                            Log.e("Error", "Error getting friend document: ", friendTask.getException());
-//                        }
-//                    });
-//                }
-//
-//                this.binding.progressCircular.setVisibility(View.GONE);
-//            } else {
-//                Log.e("Error", "Error getting friends for specific user: " + specificUserID, task.getException());
-//            }
-//        });
-//
-//    }
-
     @Override
     public void onFriendClicked(User user) {
         Intent intent = new Intent(getApplicationContext(), ChatActivity.class);
+        intent.putExtra(Constant.KEY_USER, user);
+        startActivity(intent);
+    }
+
+    @Override
+    public void onShowInfoButtonClicked(User user) {
+        Intent intent = new Intent(getApplicationContext(), UserInfoActivity.class);
         intent.putExtra(Constant.KEY_USER, user);
         startActivity(intent);
     }

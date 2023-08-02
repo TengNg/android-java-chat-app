@@ -75,4 +75,17 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/showFriendsButton"
         app:layout_constraintVertical_bias="0.338" />
+
+    <TextView
+        android:id="@+id/friendRequestCountTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top"
+        android:background="@drawable/ic_red_circle"
+        android:gravity="center"
+        android:text=""
+        android:textColor="@color/white"
+        app:layout_constraintEnd_toStartOf="@+id/notificationsButton"
+        app:layout_constraintTop_toTopOf="@+id/notificationsButton" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

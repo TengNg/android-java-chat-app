@@ -86,7 +86,7 @@
         android:layout_gravity="top"
         android:background="@drawable/ic_red_circle"
         android:gravity="center"
-        android:text="1"
+        android:text=""
         android:textColor="@color/white"
         app:layout_constraintEnd_toStartOf="@+id/pendingButton"
         app:layout_constraintTop_toTopOf="parent" />
@@ -95,7 +95,7 @@
         android:id="@+id/pendingButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Pending"
+        android:text="Activity Log"
         app:layout_constraintBottom_toBottomOf="@+id/friendsTextView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/friendsTextView"

@@ -233,15 +233,52 @@ public class UserInfoActivity extends AppCompatActivity {
     }
 
     private void handleUnfriend() {
-        User receiver = ((User) getIntent().getSerializableExtra(Constant.KEY_USER));
-        String user1Id = receiver.id;
-        String user2Id = this.preferenceManager.getString(Constant.KEY_USER_ID);
+        User currentUser = ((User) getIntent().getSerializableExtra(Constant.KEY_USER));
+        String id1 = currentUser.id;
+        String id2 = this.preferenceManager.getString(Constant.KEY_USER_ID);
 
-        DocumentReference user1Ref = db.collection(Constant.KEY_COLLECTION_USERS).document(user1Id);
-        DocumentReference user2Ref = db.collection(Constant.KEY_COLLECTION_USERS).document(user2Id);
+        DocumentReference user1Ref = this.db.
+                collection(Constant.KEY_COLLECTION_USERS)
+                .document(id1)
+                .collection(Constant.KEY_COLLECTION_USER_FRIENDS)
+                .document(id2);
+
+        DocumentReference user2Ref = this.db.
+                collection(Constant.KEY_COLLECTION_USERS)
+                .document(id2)
+                .collection(Constant.KEY_COLLECTION_USER_FRIENDS)
+                .document(id1);
 
         this.binding.unfriendButton.setOnClickListener(v -> {
+            user1Ref.get().addOnCompleteListener(task -> {
+                DocumentSnapshot document = task.getResult();
+                if (task.isSuccessful()) {
+                    if (document.exists()) {
+                        user1Ref.delete()
+                                .addOnSuccessListener(deleteTask -> {
+                                    user2Ref.delete()
+                                            .addOnSuccessListener(task2 -> {
+                                                this.onFriendRequestStatus(FriendRequestStatus.NOT_FOUND);
+                                                this.showToast("Unfriend " + currentUser.name);
+                                            })
+                                            .addOnFailureListener(e -> {
+                                                this.showToast(id2 + " is not friend with " + currentUser.name);
+                                            });
+                                })
+                                .addOnFailureListener(e -> {
+                                    this.showToast("Error");
+                                });
+                    } else {
+                        this.onFriendRequestStatus(FriendRequestStatus.NOT_FOUND);
+                        this.showToast("You are not friend with " + currentUser.name);
+                    }
+                } else {
+                    this.showToast("Error");
+                }
+            });
 
+            this.binding.unfriendButton.setVisibility(View.GONE);
+            this.onFriendRequestStatus(FriendRequestStatus.NOT_FOUND);
         });
     }
 
@@ -263,29 +300,30 @@ public class UserInfoActivity extends AppCompatActivity {
             friendRequestData.put("timestamp", new Date());
 
             this.db.collection(Constant.KEY_COLLECTION_FRIEND_REQUESTS)
-                    .whereEqualTo(Constant.KEY_SENDER_ID, senderId)
-                    .whereEqualTo(Constant.KEY_RECEIVER_ID, receiverId)
-                    .whereIn(Constant.KEY_FRIEND_REQUEST_STATUS, Arrays.asList("accepted", "pending")) // only check for pending and accepted status
+                    .whereIn(Constant.KEY_SENDER_ID, Arrays.asList(senderId, receiverId))
+                    .whereIn(Constant.KEY_RECEIVER_ID, Arrays.asList(senderId, receiverId))
+                    .whereEqualTo(Constant.KEY_FRIEND_REQUEST_STATUS, "pending")
                     .get()
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
+                            this.binding.addFriendButton.setVisibility(View.GONE);
                             boolean isSent = !task.getResult().isEmpty();
                             if (isSent) {
-                                this.showToast("You have already sent friend request to this user");
+                                this.onFriendRequestStatus(FriendRequestStatus.PENDING_RECEIVED);
+                                this.showToast("This user have already sent you a friend request");
                             } else {
                                 DocumentReference newNotificationRef = db.collection(Constant.KEY_COLLECTION_FRIEND_REQUESTS).document();
                                 newNotificationRef.set(friendRequestData);
+
+                                this.onFriendRequestStatus(FriendRequestStatus.PENDING_SENT);
                                 this.showToast("Friend request sent");
+
                             }
                         }
                     })
                     .addOnFailureListener(e -> {
                         this.showToast("Error");
                     });
-
-
-            this.binding.addFriendButton.setVisibility(View.GONE);
-            this.onFriendRequestStatus(FriendRequestStatus.PENDING_SENT);
         });
     }
 

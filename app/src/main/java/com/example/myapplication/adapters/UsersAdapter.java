@@ -13,12 +13,17 @@ import com.example.myapplication.models.User;
 import java.util.List;
 
 public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UserViewHolder> {
-    private final List<User> users;
+    private List<User> users;
     private final UserListener userListener;
 
     public UsersAdapter(List<User> users, UserListener userListener) {
         this.users = users;
         this.userListener = userListener;
+    }
+
+    public void updateList(List<User> users){
+        this.users = users;
+        notifyDataSetChanged();
     }
 
     @NonNull

@@ -13,8 +13,11 @@ import com.example.myapplication.listeners.FriendRequestListener;
 import com.example.myapplication.models.FriendRequest;
 import com.example.myapplication.utilities.Constant;
 import com.example.myapplication.utilities.PreferenceManager;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 
@@ -40,7 +43,8 @@ public class FriendRequestsActivity extends AppCompatActivity implements FriendR
         setContentView(this.binding.getRoot());
         this.handleBackPressed();
         this.initialize();
-        this.getFriendRequests();
+//        this.getFriendRequests();
+        this.listenFriendRequests();
     }
 
     private void initialize() {
@@ -59,34 +63,70 @@ public class FriendRequestsActivity extends AppCompatActivity implements FriendR
         this.binding.backButton.setOnClickListener(v -> onBackPressed());
     }
 
-    private void getFriendRequests() {
-        this.db.collection(Constant.KEY_COLLECTION_FRIEND_REQUESTS)
+    private void listenFriendRequests() {
+        db.collection(Constant.KEY_COLLECTION_FRIEND_REQUESTS)
                 .whereEqualTo(Constant.KEY_RECEIVER_ID, this.preferenceManager.getString(Constant.KEY_USER_ID))
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        QuerySnapshot querySnapshot = task.getResult();
-                        if (querySnapshot != null) {
-                            for (DocumentSnapshot document : querySnapshot.getDocuments()) {
-                                FriendRequest friendRequest = new FriendRequest();
-                                friendRequest.id = document.getId();
-                                friendRequest.status = document.getString(Constant.KEY_FRIEND_REQUEST_STATUS);
-                                friendRequest.receiverId = document.getString(Constant.KEY_RECEIVER_ID);
-                                friendRequest.receiverName = document.getString(Constant.KEY_RECEIVER_NAME);
-                                friendRequest.senderId = document.getString(Constant.KEY_SENDER_ID);
-                                friendRequest.senderName = document.getString(Constant.KEY_SENDER_NAME);
-                                friendRequest.dateObject = document.getDate(Constant.KEY_TIMESTAMP);
-                                friendRequest.dateTime = getSimpleMessageDateTime(friendRequest.dateObject);
-                                this.friendRequests.add(friendRequest);
-                                this.friendRequestsAdapter.notifyDataSetChanged();
-                            }
-                        }
-                        this.binding.progressCircular.setVisibility(View.GONE);
-                    } else {
-                        Log.d("Error", "Can't get any notification");
-                    }
-                });
+                .addSnapshotListener(friendRequestsEventListener);
     }
+
+    private final EventListener<QuerySnapshot> friendRequestsEventListener = (value, error) -> {
+        if (error != null) {
+            return;
+        }
+
+        if (value != null) {
+            int idx = 0;
+            for (DocumentChange document : value.getDocumentChanges()) {
+                if (document.getType() == DocumentChange.Type.ADDED) {
+                    FriendRequest friendRequest = new FriendRequest();
+                    friendRequest.id = document.getDocument().getId();
+                    friendRequest.status = document.getDocument().getString(Constant.KEY_FRIEND_REQUEST_STATUS);
+                    friendRequest.receiverId = document.getDocument().getString(Constant.KEY_RECEIVER_ID);
+                    friendRequest.receiverName = document.getDocument().getString(Constant.KEY_RECEIVER_NAME);
+                    friendRequest.senderId = document.getDocument().getString(Constant.KEY_SENDER_ID);
+                    friendRequest.senderName = document.getDocument().getString(Constant.KEY_SENDER_NAME);
+                    friendRequest.dateObject = document.getDocument().getDate(Constant.KEY_TIMESTAMP);
+                    friendRequest.dateTime = getSimpleMessageDateTime(friendRequest.dateObject);
+                    this.friendRequests.add(friendRequest);
+                    this.friendRequestsAdapter.notifyDataSetChanged();
+                } else if (document.getType() == DocumentChange.Type.REMOVED) {
+                    this.friendRequests.remove(idx);
+                    this.friendRequestsAdapter.notifyDataSetChanged();
+                }
+                idx += 1;
+            }
+            this.binding.progressCircular.setVisibility(View.GONE);
+        }
+    };
+
+//    private void getFriendRequests() {
+//        this.db.collection(Constant.KEY_COLLECTION_FRIEND_REQUESTS)
+//                .whereEqualTo(Constant.KEY_RECEIVER_ID, this.preferenceManager.getString(Constant.KEY_USER_ID))
+//                .get()
+//                .addOnCompleteListener(task -> {
+//                    if (task.isSuccessful()) {
+//                        QuerySnapshot querySnapshot = task.getResult();
+//                        if (querySnapshot != null) {
+//                            for (DocumentSnapshot document : querySnapshot.getDocuments()) {
+//                                FriendRequest friendRequest = new FriendRequest();
+//                                friendRequest.id = document.getId();
+//                                friendRequest.status = document.getString(Constant.KEY_FRIEND_REQUEST_STATUS);
+//                                friendRequest.receiverId = document.getString(Constant.KEY_RECEIVER_ID);
+//                                friendRequest.receiverName = document.getString(Constant.KEY_RECEIVER_NAME);
+//                                friendRequest.senderId = document.getString(Constant.KEY_SENDER_ID);
+//                                friendRequest.senderName = document.getString(Constant.KEY_SENDER_NAME);
+//                                friendRequest.dateObject = document.getDate(Constant.KEY_TIMESTAMP);
+//                                friendRequest.dateTime = getSimpleMessageDateTime(friendRequest.dateObject);
+//                                this.friendRequests.add(friendRequest);
+//                                this.friendRequestsAdapter.notifyDataSetChanged();
+//                            }
+//                        }
+//                        this.binding.progressCircular.setVisibility(View.GONE);
+//                    } else {
+//                        Log.d("Error", "Can't get any notification");
+//                    }
+//                });
+//    }
 
     private String getSimpleMessageDateTime(Date date) {
         return new SimpleDateFormat("MMMM dd, yyyy - hh:mm a", Locale.getDefault()).format(date);
@@ -123,23 +163,6 @@ public class FriendRequestsActivity extends AppCompatActivity implements FriendR
 
     @Override
     public void onDeclineButtonClicked(FriendRequest friendRequest) {
-        String senderId = friendRequest.senderId;
-        String receiverId = friendRequest.receiverId;
-
-        HashMap<String, Boolean> friendId1 = new HashMap<>();
-        friendId1.put(receiverId, true);
-        this.db.collection(Constant.KEY_COLLECTION_USERS)
-                .document(senderId)
-                .collection(Constant.KEY_COLLECTION_USER_FRIENDS)
-                .add(friendId1);
-
-        HashMap<String, Boolean> friendId2 = new HashMap<>();
-        friendId2.put(senderId, true);
-        this.db.collection(Constant.KEY_COLLECTION_USERS)
-                .document(receiverId)
-                .collection(Constant.KEY_COLLECTION_USER_FRIENDS)
-                .add(friendId2);
-
         DocumentReference docRef = this.db.collection(Constant.KEY_COLLECTION_FRIEND_REQUESTS).document(friendRequest.id);
         Map<String, Object> updateData = new HashMap<>();
         updateData.put(Constant.KEY_FRIEND_REQUEST_STATUS, "declined");

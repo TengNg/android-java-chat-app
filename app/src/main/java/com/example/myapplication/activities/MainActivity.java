@@ -62,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
         showToast("Signing out...");
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         DocumentReference dr = db.collection(Constant.KEY_COLLECTION_USERS).document(this.preferenceManager.getString(Constant.KEY_USER_ID));
+
         HashMap<String, Object> newData = new HashMap<>();
         newData.put(Constant.KEY_FCM_TOKEN, FieldValue.delete());
         dr.update(newData)
@@ -91,5 +92,9 @@ public class MainActivity extends AppCompatActivity {
         this.binding.notificationsButton.setOnClickListener(v -> {
             startActivity(new Intent(getApplicationContext(), NotificationActivity.class));
         });
+    }
+
+    private void getNotificationsCount() {
+
     }
 }

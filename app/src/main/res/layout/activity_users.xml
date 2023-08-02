@@ -32,6 +32,23 @@
         app:layout_constraintStart_toEndOf="@+id/backButton"
         app:layout_constraintTop_toTopOf="@+id/backButton" />
 
+    <EditText
+        android:id="@+id/searchInput"
+        android:layout_width="0dp"
+        android:layout_height="45dp"
+        android:background="@drawable/back_with_border"
+        android:hint="Search 🔎"
+        android:imeOptions="actionDone"
+        android:inputType="text"
+        android:paddingStart="16dp"
+        android:paddingRight="10dp"
+        android:textSize="16dp"
+        android:layout_margin="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/findMoreFriendsTextView"
+        />
+
     <LinearLayout
         android:id="@+id/frameLayout"
         android:layout_width="match_parent"
@@ -41,7 +58,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/backButton">
+        app:layout_constraintTop_toBottomOf="@+id/searchInput">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/usersRecyclerView"
@@ -59,6 +76,7 @@
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_gravity="center"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

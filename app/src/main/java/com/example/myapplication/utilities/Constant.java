@@ -28,4 +28,7 @@ public class Constant {
 
     public static final String KEY_MESSAGE = "message";
     public static final String KEY_TIMESTAMP = "timestamp";
+
+    // Others ==========
+    public static final String KEY_IS_NOTIFICATION_SEEN = "isNotificationsSeen";
 }

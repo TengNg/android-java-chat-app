@@ -5,6 +5,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
@@ -15,6 +17,7 @@ import com.example.myapplication.listeners.UserListener;
 import com.example.myapplication.models.User;
 import com.example.myapplication.utilities.Constant;
 import com.example.myapplication.utilities.PreferenceManager;
+import com.example.myapplication.utilities.Validator;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
@@ -49,7 +52,6 @@ public class UsersActivity extends AppCompatActivity implements UserListener {
         this.binding = ActivityUsersBinding.inflate(getLayoutInflater());
         setContentView(this.binding.getRoot());
         this.preferenceManager = new PreferenceManager(getApplicationContext());
-        this.binding.progressCircular.setVisibility(View.VISIBLE);
         this.handleBackPressed();
         initialize();
         getUsers();
@@ -74,90 +76,57 @@ public class UsersActivity extends AppCompatActivity implements UserListener {
         this.binding.backButton.setOnClickListener(v -> onBackPressed());
     }
 
-    public void getUsers() {
-        CollectionReference usersCollection = this.db.collection(Constant.KEY_COLLECTION_USERS);
-        String specificUserID = this.preferenceManager.getString(Constant.KEY_USER_ID);
-        CollectionReference specificUserFriendsRef = usersCollection.document(specificUserID).collection(Constant.KEY_COLLECTION_USER_FRIENDS);
-
-        specificUserFriendsRef.get().addOnSuccessListener(friendsQuerySnapshot -> {
-            List<String> friendIDs = new ArrayList<>();
-            for (DocumentSnapshot documentSnapshot : friendsQuerySnapshot.getDocuments()) {
-                String friendID = documentSnapshot.getData().keySet().iterator().next(); // get only first field in a document
-                friendIDs.add(friendID);
+    private void getUsers() {
+        this.binding.searchInput.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
             }
 
-            usersCollection.get().addOnSuccessListener(usersQuerySnapshot -> {
-                List<DocumentSnapshot> allUsers = usersQuerySnapshot.getDocuments();
-                List<DocumentSnapshot> nonFriendUsers = new ArrayList<>();
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
 
-                for (DocumentSnapshot user : allUsers) {
-                    String userID = user.getId();
-                    if (!friendIDs.contains(userID) && !userID.equals(specificUserID)) {
-                        nonFriendUsers.add(user);
-                    }
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (s.length() == 0) {
+                    usersAdapter.updateList(new ArrayList<>());
+                    return;
                 }
 
-                for (DocumentSnapshot document : nonFriendUsers) {
-                    User u = new User();
-                    u.email = document.getString(Constant.KEY_EMAIL);
-                    u.name = document.getString(Constant.KEY_NAME);
-                    u.token = document.getString(Constant.KEY_FCM_TOKEN);
-                    u.id = document.getId();
-                    this.users.add(u);
-                    this.usersAdapter.notifyDataSetChanged();
-                }
+                binding.progressCircular.setVisibility(View.VISIBLE);
 
-                this.binding.progressCircular.setVisibility(View.GONE);
-            }).addOnFailureListener(e -> {
-                this.showErrorMsg();
-            });
-        }).addOnFailureListener(e -> {
-            this.showErrorMsg();
+                CollectionReference usersRef = db.collection(Constant.KEY_COLLECTION_USERS);
+                usersRef.orderBy(Constant.KEY_NAME).startAt(s.toString()).endAt(s.toString() + "\uf8ff")
+                        .get()
+                        .addOnCompleteListener(task -> {
+                            String currentUserId = preferenceManager.getString(Constant.KEY_USER_ID);
+                            if (task.isSuccessful() && task.getResult() != null) {
+                                List<User> result = new ArrayList<>();
+                                for (QueryDocumentSnapshot queryDocumentSnapshot : task.getResult()) {
+                                    if (currentUserId.equals(queryDocumentSnapshot.getId()))
+                                        continue;
+                                    User u = new User();
+                                    u.email = queryDocumentSnapshot.getString(Constant.KEY_EMAIL);
+                                    u.name = queryDocumentSnapshot.getString(Constant.KEY_NAME);
+                                    u.token = queryDocumentSnapshot.getString(Constant.KEY_FCM_TOKEN);
+                                    u.id = queryDocumentSnapshot.getId();
+                                    result.add(u);
+                                }
+
+                                if (result.size() > 0) {
+                                    usersAdapter.updateList(result);
+                                    binding.usersRecyclerView.setVisibility(View.VISIBLE);
+                                    binding.progressCircular.setVisibility(View.INVISIBLE);
+                                } else {
+                                    Log.d("NoUsersFound", "No users found");
+                                }
+                            } else {
+                                showErrorMsg();
+                            }
+                        });
+            }
+
         });
-
-//        Task<QuerySnapshot> usersTask = usersCollection.get();
-//        usersTask.continueWithTask(task -> {
-//            CollectionReference specificUserFriendsRef = usersCollection.document(specificUserID).collection(Constant.KEY_COLLECTION_USER_FRIENDS);
-//            return specificUserFriendsRef.get();
-//        }).addOnSuccessListener(friendsQuerySnapshot -> {
-//            List<DocumentSnapshot> allUsers = usersTask.getResult().getDocuments();
-//            List<DocumentSnapshot> nonFriendUsers = new ArrayList<>();
-//            List<String> friendIDs = new ArrayList<>();
-//
-//            for (DocumentSnapshot friend : friendsQuerySnapshot.getDocuments()) {
-//                friendIDs.add(friend.getId());
-//                String id = friend.getData().keySet().iterator().next(); // get only first field in a document
-//                friendIDs.add(id);
-//            }
-//
-//            for (DocumentSnapshot user : allUsers) {
-//                String userID = user.getId();
-//
-//                if (userID.equals(specificUserID))
-//                    continue;
-//
-//                if (friendIDs.contains(userID))
-//                    continue;
-//
-//                nonFriendUsers.add(user);
-//            }
-//
-//            for (DocumentSnapshot document : nonFriendUsers) {
-//                User u = new User();
-//                u.email = document.getString(Constant.KEY_EMAIL);
-//                u.name = document.getString(Constant.KEY_NAME);
-//                u.token = document.getString(Constant.KEY_FCM_TOKEN);
-//                u.id = document.getId();
-//                this.users.add(u);
-//                this.usersAdapter.notifyDataSetChanged();
-//            }
-//
-//            this.binding.progressCircular.setVisibility(View.GONE);
-//
-//        }).addOnFailureListener(e -> {
-//            this.showErrorMsg();
-//        });
-
     }
 
     @Override
