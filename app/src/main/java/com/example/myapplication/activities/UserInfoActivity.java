@@ -237,14 +237,14 @@ public class UserInfoActivity extends AppCompatActivity {
         String id1 = currentUser.id;
         String id2 = this.preferenceManager.getString(Constant.KEY_USER_ID);
 
-        DocumentReference user1Ref = this.db.
-                collection(Constant.KEY_COLLECTION_USERS)
+        DocumentReference user1Ref = this.db
+                .collection(Constant.KEY_COLLECTION_USERS)
                 .document(id1)
                 .collection(Constant.KEY_COLLECTION_USER_FRIENDS)
                 .document(id2);
 
-        DocumentReference user2Ref = this.db.
-                collection(Constant.KEY_COLLECTION_USERS)
+        DocumentReference user2Ref = this.db
+                .collection(Constant.KEY_COLLECTION_USERS)
                 .document(id2)
                 .collection(Constant.KEY_COLLECTION_USER_FRIENDS)
                 .document(id1);

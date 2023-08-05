@@ -100,6 +100,7 @@ public class SignUpActivity extends AppCompatActivity {
         user.put(Constant.KEY_NAME, binding.signUpUsernameInput.getText().toString());
         user.put(Constant.KEY_EMAIL, binding.signUpEmailInput.getText().toString());
         user.put(Constant.KEY_PASSWORD, binding.signUpPasswordInput.getText().toString());
+        user.put(Constant.KEY_IS_AVAILABLE, true);
 //        user.put(Constant.KEY_IMAGE, this.encodedImage);
 
         if (this.binding.maleRadioButton.isChecked()) {

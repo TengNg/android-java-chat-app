@@ -59,8 +59,15 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.FriendVi
         void setUserData(User user) {
             this.binding.emailTextView.setText(user.email);
             this.binding.nameTextView.setText(user.name);
+
+            if (user.isAvailable) {
+                this.binding.activeStatusImage.setVisibility(View.VISIBLE);
+            } else {
+                this.binding.activeStatusImage.setVisibility(View.INVISIBLE);
+            }
+
             binding.getRoot().setOnClickListener(v -> friendListener.onFriendClicked(user));
-            binding.getRoot().setOnClickListener(v -> friendListener.onShowInfoButtonClicked(user));
+            binding.infoImage.setOnClickListener(v -> friendListener.onShowInfoButtonClicked(user));
         }
     }
 }

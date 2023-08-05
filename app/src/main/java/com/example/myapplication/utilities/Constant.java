@@ -31,4 +31,5 @@ public class Constant {
 
     // Others ==========
     public static final String KEY_IS_NOTIFICATION_SEEN = "isNotificationsSeen";
+    public static final String KEY_IS_AVAILABLE = "isAvailable";
 }

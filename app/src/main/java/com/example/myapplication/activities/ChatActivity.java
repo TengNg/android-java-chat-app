@@ -47,6 +47,7 @@ public class ChatActivity extends AppCompatActivity {
         handleSendMessage();
         handleShowUserInfo();
         listenMessages();
+        listenFriendActiveStatus();
     }
 
     private void initialize() {
@@ -84,6 +85,33 @@ public class ChatActivity extends AppCompatActivity {
                 .whereEqualTo(Constant.KEY_SENDER_ID, receiver.id)
                 .whereEqualTo(Constant.KEY_RECEIVER_ID, preferenceManager.getString(Constant.KEY_USER_ID))
                 .addSnapshotListener(eventListener);
+    }
+
+    private void listenFriendActiveStatus() {
+        User currentUser = (User) getIntent().getSerializableExtra(Constant.KEY_USER);
+
+        DocumentReference docRef = db.collection(Constant.KEY_COLLECTION_USERS).document(currentUser.id);
+
+        docRef.addSnapshotListener((snapshot, e) -> {
+            if (e != null) {
+                Log.e("Firestore", "Error listening for document changes.", e);
+                return;
+            }
+
+            if (snapshot != null && snapshot.exists()) {
+                boolean isAvail = snapshot.getBoolean(Constant.KEY_IS_AVAILABLE);
+
+                if (isAvail == true) {
+                    this.binding.activeStatusImage.setVisibility(View.VISIBLE);
+                } else {
+                    this.binding.activeStatusImage.setVisibility(View.INVISIBLE);
+                }
+
+            } else {
+                // The document has been deleted.
+                Log.d("Firestore", "Document does not exist.");
+            }
+        });
     }
 
     private final EventListener<QuerySnapshot> eventListener = (value, error) -> {

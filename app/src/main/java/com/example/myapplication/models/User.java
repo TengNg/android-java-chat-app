@@ -1,7 +1,5 @@
 package com.example.myapplication.models;
 
-import androidx.annotation.NonNull;
-
 import java.io.Serializable;
 
 public class User implements Serializable {
@@ -10,5 +8,5 @@ public class User implements Serializable {
     public String token;
     public String id; // could be senderId or receiverId
 
-    public boolean inFriendRequest = false;
+    public boolean isAvailable;
 }

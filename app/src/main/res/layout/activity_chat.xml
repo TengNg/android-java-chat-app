@@ -84,6 +84,17 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/messageInput" />
 
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/activeStatusImage"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:background="@drawable/ic_active"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="@+id/usernameTextView"
+        app:layout_constraintStart_toEndOf="@+id/usernameTextView"
+        app:layout_constraintTop_toTopOf="@+id/usernameTextView"
+        />
+
     <ProgressBar
         android:id="@+id/progressCircular"
         android:layout_width="40dp"

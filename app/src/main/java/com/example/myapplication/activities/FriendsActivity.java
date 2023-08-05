@@ -1,7 +1,5 @@
 package com.example.myapplication.activities;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
@@ -22,16 +20,12 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
-public class FriendsActivity extends AppCompatActivity implements FriendListener {
+public class FriendsActivity extends BaseActivity implements FriendListener {
     private ActivityFriendsBinding binding;
     private PreferenceManager preferenceManager;
     private List<User> users;
@@ -113,9 +107,7 @@ public class FriendsActivity extends AppCompatActivity implements FriendListener
             for (DocumentChange documentChange : value.getDocumentChanges()) {
                 String friendId = documentChange.getDocument().getId();
                 if (documentChange.getType() == DocumentChange.Type.ADDED) {
-
                     DocumentReference friendUserRef = usersRef.document(friendId);
-
                     friendUserRef.get().addOnCompleteListener(friendTask -> {
                         if (friendTask.isSuccessful()) {
                             DocumentSnapshot friendDocument = friendTask.getResult();
@@ -123,43 +115,15 @@ public class FriendsActivity extends AppCompatActivity implements FriendListener
                                 String friendUsername = friendDocument.getString(Constant.KEY_NAME);
                                 String friendEmail = friendDocument.getString(Constant.KEY_EMAIL);
                                 String friendToken = friendDocument.getString(Constant.KEY_FCM_TOKEN);
-
+                                boolean friendAvailability = Boolean.TRUE.equals(friendDocument.getBoolean(Constant.KEY_IS_AVAILABLE));
                                 User user = new User();
                                 user.name = friendUsername;
                                 user.email = friendEmail;
                                 user.token = friendToken;
                                 user.id = friendTask.getResult().getId();
-
+                                user.isAvailable = friendAvailability;
                                 this.users.add(user);
-
-                                if (this.users.size() > 0) {
-                                    friendsAdapter.updateList(users);
-                                    this.binding.searchInput.addTextChangedListener(new TextWatcher() {
-                                        @Override
-                                        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
-
-                                        @Override
-                                        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
-
-                                        @Override
-                                        public void afterTextChanged(Editable editable) {
-                                            if (editable.length() == 0) {
-                                                friendsAdapter.updateList(users);
-                                                return;
-                                            }
-
-                                            List<User> filteredList = new ArrayList<>();
-                                            for (User user : users) {
-                                                if (user.name.contains(editable.toString())) {
-                                                    filteredList.add(user);
-                                                }
-                                            }
-
-                                            friendsAdapter.updateList(filteredList);
-
-                                        }
-                                    });
-                                }
+                                this.friendsAdapter.notifyDataSetChanged();
                             } else {
                                 Log.d("FriendInfo", "Friend document does not exist");
                             }
@@ -167,10 +131,36 @@ public class FriendsActivity extends AppCompatActivity implements FriendListener
                             Log.e("Error", "Error getting friend document: ", friendTask.getException());
                         }
                     });
-                }
 
-                this.binding.progressCircular.setVisibility(View.GONE);
+                }
             }
+
+            this.binding.progressCircular.setVisibility(View.GONE);
+
+            this.binding.searchInput.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+
+                @Override
+                public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+
+                @Override
+                public void afterTextChanged(Editable editable) {
+                    if (editable.length() == 0) {
+                        friendsAdapter.updateList(users);
+                        return;
+                    }
+
+                    List<User> filteredList = new ArrayList<>();
+                    for (User user : users) {
+                        if (user.name.contains(editable.toString())) {
+                            filteredList.add(user);
+                        }
+                    }
+
+                    friendsAdapter.updateList(filteredList);
+                }
+            });
 
         } else {
             this.showErrorMsg();

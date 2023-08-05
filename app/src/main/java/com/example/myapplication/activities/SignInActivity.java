@@ -58,6 +58,11 @@ public class SignInActivity extends AppCompatActivity {
                         this.preferenceManager.putBoolean(Constant.KEY_IS_SIGNED_IN, true);
                         this.preferenceManager.putString(Constant.KEY_USER_ID, documentSnapshot.getId());
                         this.preferenceManager.putString(Constant.KEY_NAME, documentSnapshot.getString(Constant.KEY_NAME));
+
+                        db.collection(Constant.KEY_COLLECTION_USERS)
+                                .document(preferenceManager.getString(Constant.KEY_USER_ID))
+                                .update(Constant.KEY_IS_AVAILABLE, true);
+
                         Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         startActivity(intent);

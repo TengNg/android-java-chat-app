@@ -16,7 +16,7 @@ import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.HashMap;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends BaseActivity {
     private ActivityMainBinding binding;
     private PreferenceManager preferenceManager;
 
@@ -65,6 +65,7 @@ public class MainActivity extends AppCompatActivity {
 
         HashMap<String, Object> newData = new HashMap<>();
         newData.put(Constant.KEY_FCM_TOKEN, FieldValue.delete());
+        newData.put(Constant.KEY_IS_AVAILABLE, false);
         dr.update(newData)
                 .addOnSuccessListener(unused -> {
                     preferenceManager.clear();
