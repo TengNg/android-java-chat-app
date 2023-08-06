@@ -9,13 +9,13 @@ import android.view.View;
 
 import com.example.myapplication.adapters.ChatAdapter;
 import com.example.myapplication.databinding.ActivityChatBinding;
-import com.example.myapplication.databinding.ItemContainerUserBinding;
 import com.example.myapplication.models.ChatMessage;
 import com.example.myapplication.models.User;
 import com.example.myapplication.utilities.Constant;
 import com.example.myapplication.utilities.PreferenceManager;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -35,6 +35,7 @@ public class ChatActivity extends AppCompatActivity {
     private ChatAdapter chatAdapter;
     private PreferenceManager preferenceManager;
     private FirebaseFirestore db;
+    private String conversationId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,7 +69,22 @@ public class ChatActivity extends AppCompatActivity {
         data.put(Constant.KEY_MESSAGE, this.binding.messageInput.getText().toString());
         db.collection(Constant.KEY_COLLECTION_CHAT).add(data);
 
-        this.binding.messageInput.setText("");
+        if (this.conversationId != null) {
+            this.updateConversation(this.binding.messageInput.getText().toString());
+        } else {
+            HashMap<String, Object> conversation = new HashMap<>();
+            conversation.put(Constant.KEY_SENDER_ID, this.preferenceManager.getString(Constant.KEY_USER_ID));
+            conversation.put(Constant.KEY_SENDER_NAME, this.preferenceManager.getString(Constant.KEY_NAME));
+            conversation.put(Constant.KEY_SENDER_IMAGE, this.preferenceManager.getString(Constant.KEY_IMAGE));
+            conversation.put(Constant.KEY_RECEIVER_ID, this.receiver.id);
+            conversation.put(Constant.KEY_RECEIVER_NAME, this.receiver.name);
+            conversation.put(Constant.KEY_RECEIVER_IMAGE, this.receiver.image);
+            conversation.put(Constant.KEY_LAST_MESSAGE, this.binding.messageInput.getText().toString());
+            conversation.put(Constant.KEY_TIMESTAMP, new Date());
+            this.addConversation(conversation);
+        }
+
+        this.binding.messageInput.setText(null);
     }
 
     private void handleSendMessage() {
@@ -146,6 +162,10 @@ public class ChatActivity extends AppCompatActivity {
         }
 
         this.binding.progressCircular.setVisibility(View.GONE);
+
+        if (this.conversationId == null) {
+            this.checkConversation();
+        }
     };
 
     private void getReceiverInfo() {
@@ -173,5 +193,39 @@ public class ChatActivity extends AppCompatActivity {
 
     private String getSimpleMessageDateTime(Date date) {
         return new SimpleDateFormat("MMMM dd, yyyy - hh:mm a", Locale.getDefault()).format(date);
+    }
+
+    private void updateConversation(String message) {
+        DocumentReference docRef = this.db.collection(Constant.KEY_COLLECTION_CONVERSATIONS).document(this.conversationId);
+        docRef.update(
+                Constant.KEY_LAST_MESSAGE, message,
+                Constant.KEY_TIMESTAMP, new Date()
+        );
+    }
+
+    private void addConversation(HashMap<String, Object> conversation) {
+        this.db.collection(Constant.KEY_COLLECTION_CONVERSATIONS)
+                .add(conversation)
+                .addOnSuccessListener(docRef -> conversationId = docRef.getId());
+    }
+
+    private void checkConversation() {
+        if (this.chatMessages.size() > 0) {
+            checkConversationById(this.preferenceManager.getString(Constant.KEY_USER_ID), receiver.id);
+            checkConversationById(receiver.id, this.preferenceManager.getString(Constant.KEY_USER_ID));
+        }
+    }
+
+    private void checkConversationById(String senderId, String receiverId) {
+        this.db.collection(Constant.KEY_COLLECTION_CONVERSATIONS)
+                .whereEqualTo(Constant.KEY_SENDER_ID, senderId)
+                .whereEqualTo(Constant.KEY_RECEIVER_ID, receiverId)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful() && task.getResult() != null && task.getResult().getDocuments().size() > 0) {
+                        DocumentSnapshot documentSnapshot = task.getResult().getDocuments().get(0);
+                        this.conversationId = documentSnapshot.getId();
+                    }
+                });
     }
 }

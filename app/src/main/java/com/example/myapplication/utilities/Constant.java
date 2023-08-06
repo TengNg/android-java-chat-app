@@ -29,6 +29,12 @@ public class Constant {
     public static final String KEY_MESSAGE = "message";
     public static final String KEY_TIMESTAMP = "timestamp";
 
+    // Conversations ==========
+    public static final String KEY_COLLECTION_CONVERSATIONS = "conversations";
+    public static final String KEY_SENDER_IMAGE = "senderImage";
+    public static final String KEY_RECEIVER_IMAGE = "receiverImage";
+    public static final String KEY_LAST_MESSAGE = "lastMessage";
+
     // Others ==========
     public static final String KEY_IS_NOTIFICATION_SEEN = "isNotificationsSeen";
     public static final String KEY_IS_AVAILABLE = "isAvailable";

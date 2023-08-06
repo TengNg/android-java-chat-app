@@ -21,6 +21,10 @@ public class SignInActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         preferenceManager = new PreferenceManager(getApplicationContext());
         if (preferenceManager.getBoolean(Constant.KEY_IS_SIGNED_IN)) {
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+            db.collection(Constant.KEY_COLLECTION_USERS)
+                    .document(preferenceManager.getString(Constant.KEY_USER_ID))
+                    .update(Constant.KEY_IS_AVAILABLE, true);
             startActivity(new Intent(getApplicationContext(), MainActivity.class));
             finish();
         }
@@ -58,6 +62,7 @@ public class SignInActivity extends AppCompatActivity {
                         this.preferenceManager.putBoolean(Constant.KEY_IS_SIGNED_IN, true);
                         this.preferenceManager.putString(Constant.KEY_USER_ID, documentSnapshot.getId());
                         this.preferenceManager.putString(Constant.KEY_NAME, documentSnapshot.getString(Constant.KEY_NAME));
+                        this.preferenceManager.putString(Constant.KEY_IMAGE, documentSnapshot.getString(Constant.KEY_IMAGE));
 
                         db.collection(Constant.KEY_COLLECTION_USERS)
                                 .document(preferenceManager.getString(Constant.KEY_USER_ID))
