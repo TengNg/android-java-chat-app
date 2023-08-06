@@ -1,5 +1,8 @@
 package com.example.myapplication.adapters;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
@@ -24,6 +27,11 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UserViewHold
     public void updateList(List<User> users){
         this.users = users;
         notifyDataSetChanged();
+    }
+
+    private Bitmap getUserImage(String encodedImage){
+        byte[] bytes = Base64.decode(encodedImage, Base64.DEFAULT);
+        return BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
     }
 
     @NonNull
@@ -58,6 +66,7 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UserViewHold
         void setUserData(User user) {
             this.binding.emailTextView.setText(user.email);
             this.binding.nameTextView.setText(user.name);
+            this.binding.profileImageView.setImageBitmap(getUserImage(user.image));
             this.binding.getRoot().setOnClickListener(v -> userListener.onUserClicked(user));
             this.binding.messageImage.setOnClickListener(v -> userListener.onMessageButtonClicked(user));
         }

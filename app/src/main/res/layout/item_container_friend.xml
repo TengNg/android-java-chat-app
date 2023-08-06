@@ -12,25 +12,24 @@
     <TextView
         android:id="@+id/nameTextView"
         android:layout_width="200dp"
-        android:layout_height="30dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
         android:textSize="20dp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@+id/emailTextView"
-        app:layout_constraintHorizontal_bias="0.625"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.533" />
+        app:layout_constraintStart_toEndOf="@+id/profileImageView"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/emailTextView"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
         android:textSize="15dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintStart_toEndOf="@+id/profileImageView"
+        app:layout_constraintTop_toBottomOf="@+id/nameTextView" />
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/infoImage"
@@ -51,6 +50,21 @@
         app:layout_constraintTop_toTopOf="@+id/nameTextView"
         android:layout_marginStart="8dp"
         android:visibility="invisible"
+        />
+
+    <com.makeramen.roundedimageview.RoundedImageView
+        android:id="@+id/profileImageView"
+        android:layout_width="55dp"
+        android:layout_height="58dp"
+        android:scaleType="centerCrop"
+        app:riv_oval="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.003"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.636"
+        android:background="@drawable/bg_image"
         />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

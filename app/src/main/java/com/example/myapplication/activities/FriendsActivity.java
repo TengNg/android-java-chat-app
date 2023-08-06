@@ -115,12 +115,14 @@ public class FriendsActivity extends BaseActivity implements FriendListener {
                                 String friendUsername = friendDocument.getString(Constant.KEY_NAME);
                                 String friendEmail = friendDocument.getString(Constant.KEY_EMAIL);
                                 String friendToken = friendDocument.getString(Constant.KEY_FCM_TOKEN);
+                                String image = friendDocument.getString(Constant.KEY_IMAGE);
                                 boolean friendAvailability = Boolean.TRUE.equals(friendDocument.getBoolean(Constant.KEY_IS_AVAILABLE));
                                 User user = new User();
                                 user.name = friendUsername;
                                 user.email = friendEmail;
                                 user.token = friendToken;
                                 user.id = friendTask.getResult().getId();
+                                user.image = image;
                                 user.isAvailable = friendAvailability;
                                 this.users.add(user);
                                 this.friendsAdapter.notifyDataSetChanged();
@@ -137,31 +139,34 @@ public class FriendsActivity extends BaseActivity implements FriendListener {
 
             this.binding.progressCircular.setVisibility(View.GONE);
 
-            this.binding.searchInput.addTextChangedListener(new TextWatcher() {
-                @Override
-                public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
-
-                @Override
-                public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
-
-                @Override
-                public void afterTextChanged(Editable editable) {
-                    if (editable.length() == 0) {
-                        friendsAdapter.updateList(users);
-                        return;
+            if (users.size() > 0) {
+                this.binding.searchInput.addTextChangedListener(new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                     }
 
-                    List<User> filteredList = new ArrayList<>();
-                    for (User user : users) {
-                        if (user.name.contains(editable.toString())) {
-                            filteredList.add(user);
+                    @Override
+                    public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                    }
+
+                    @Override
+                    public void afterTextChanged(Editable editable) {
+                        if (editable.length() == 0) {
+                            friendsAdapter.updateList(users);
+                            return;
                         }
+
+                        List<User> filteredList = new ArrayList<>();
+                        for (User user : users) {
+                            if (user.name.contains(editable.toString())) {
+                                filteredList.add(user);
+                            }
+                        }
+
+                        friendsAdapter.updateList(filteredList);
                     }
-
-                    friendsAdapter.updateList(filteredList);
-                }
-            });
-
+                });
+            }
         } else {
             this.showErrorMsg();
         }

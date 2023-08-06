@@ -1,5 +1,8 @@
 package com.example.myapplication.adapters;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,6 +28,11 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.FriendVi
     public void updateList(List<User> users) {
         this.users = users;
         notifyDataSetChanged();
+    }
+
+    private Bitmap getUserImage(String encodedImage){
+        byte[] bytes = Base64.decode(encodedImage, Base64.DEFAULT);
+        return BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
     }
 
     @NonNull
@@ -59,6 +67,7 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.FriendVi
         void setUserData(User user) {
             this.binding.emailTextView.setText(user.email);
             this.binding.nameTextView.setText(user.name);
+            this.binding.profileImageView.setImageBitmap(getUserImage(user.image));
 
             if (user.isAvailable) {
                 this.binding.activeStatusImage.setVisibility(View.VISIBLE);
