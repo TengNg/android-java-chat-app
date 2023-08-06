@@ -20,6 +20,7 @@ public class SignInActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         preferenceManager = new PreferenceManager(getApplicationContext());
+        preferenceManager.clear();
         if (preferenceManager.getBoolean(Constant.KEY_IS_SIGNED_IN)) {
             startActivity(new Intent(getApplicationContext(), MainActivity.class));
             finish();

@@ -30,7 +30,6 @@ import java.util.HashMap;
 public class SignUpActivity extends AppCompatActivity {
     private ActivitySignUpBinding binding;
     private PreferenceManager preferenceManager;
-
     private String encodedImage;
 
     @Override
@@ -101,7 +100,7 @@ public class SignUpActivity extends AppCompatActivity {
         user.put(Constant.KEY_EMAIL, binding.signUpEmailInput.getText().toString());
         user.put(Constant.KEY_PASSWORD, binding.signUpPasswordInput.getText().toString());
         user.put(Constant.KEY_IS_AVAILABLE, true);
-//        user.put(Constant.KEY_IMAGE, this.encodedImage);
+        user.put(Constant.KEY_IMAGE, this.encodedImage);
 
         if (this.binding.maleRadioButton.isChecked()) {
             user.put(Constant.KEY_GENDER, this.binding.maleRadioButton.getText().toString());
@@ -139,21 +138,6 @@ public class SignUpActivity extends AppCompatActivity {
                 .addOnFailureListener(ex -> {
                     showToast(ex.getMessage());
                 });
-
-//        db.collection(Constant.KEY_COLLECTION_USERS)
-//                .add(user)
-//                .addOnSuccessListener(documentReference -> {
-//                    preferenceManager.putBoolean(Constant.KEY_IS_SIGNED_IN, true);
-//                    preferenceManager.putString(Constant.KEY_USER_ID, documentReference.getId());
-//                    preferenceManager.putString(Constant.KEY_NAME, binding.signUpUsernameInput.getText().toString());
-//
-//                    Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-//                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-//                    startActivity(intent);
-//                })
-//                .addOnFailureListener(ex -> {
-//                    showToast(ex.getMessage());
-//                });
     }
 
     private void handleBackPressed() {
@@ -163,6 +147,11 @@ public class SignUpActivity extends AppCompatActivity {
     }
 
     private boolean isValidInput() {
+        if (encodedImage == null) {
+            showToast("Please select your profile image");
+            return false;
+        }
+
         if (binding.signUpUsernameInput.getText().toString().isEmpty()) {
             showToast("Please enter your username");
             return false;
@@ -188,8 +177,7 @@ public class SignUpActivity extends AppCompatActivity {
             return false;
         }
 
-        if (this.binding.genderRadioGroup.getCheckedRadioButtonId() == -1)
-        {
+        if (this.binding.genderRadioGroup.getCheckedRadioButtonId() == -1) {
             showToast("Select your gender");
             return false;
         }

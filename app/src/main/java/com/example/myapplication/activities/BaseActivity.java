@@ -24,6 +24,11 @@ public class BaseActivity extends AppCompatActivity {
                 .document(preferenceManager.getString(Constant.KEY_USER_ID));
     }
 
+    protected void onDestroy() {
+        super.onDestroy();
+        this.documentReference.update(Constant.KEY_IS_AVAILABLE, false);
+    }
+
     @Override
     protected void onPause() {
         super.onPause();
