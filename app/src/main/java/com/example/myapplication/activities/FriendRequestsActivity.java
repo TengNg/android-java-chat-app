@@ -2,6 +2,7 @@ package com.example.myapplication.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
@@ -10,6 +11,7 @@ import com.example.myapplication.adapters.FriendRequestsAdapter;
 import com.example.myapplication.databinding.ActivityFriendRequestsBinding;
 import com.example.myapplication.listeners.FriendRequestListener;
 import com.example.myapplication.models.FriendRequest;
+import com.example.myapplication.models.User;
 import com.example.myapplication.utilities.Constant;
 import com.example.myapplication.utilities.PreferenceManager;
 import com.google.firebase.firestore.DocumentChange;
@@ -166,5 +168,12 @@ public class FriendRequestsActivity extends AppCompatActivity implements FriendR
         docRef.update(updateData);
 
         this.showToast("Friend request declined");
+    }
+
+    @Override
+    public void onUserImageClicked(User user) {
+        Intent intent = new Intent(getApplicationContext(), UserInfoActivity.class);
+        intent.putExtra(Constant.KEY_USER, user);
+        startActivity(intent);
     }
 }

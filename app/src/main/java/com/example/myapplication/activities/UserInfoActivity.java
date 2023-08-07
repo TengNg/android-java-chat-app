@@ -66,7 +66,7 @@ public class UserInfoActivity extends AppCompatActivity {
         User currentUser = ((User) getIntent().getSerializableExtra(Constant.KEY_USER));
         this.binding.usernameTextView.setText(currentUser.name);
         this.binding.userEmailTextView.setText(currentUser.email);
-        checkFriendRequestStatus(currentUser.id);
+        this.checkFriendRequestStatus(currentUser.id);
     }
 
     public void checkFriendRequestStatus(String specificUserId) {

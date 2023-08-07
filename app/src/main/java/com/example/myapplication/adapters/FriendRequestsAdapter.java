@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.myapplication.databinding.ItemContainerFriendRequestPendingBinding;
 import com.example.myapplication.listeners.FriendRequestListener;
 import com.example.myapplication.models.FriendRequest;
+import com.example.myapplication.models.User;
 
 import java.util.List;
 
@@ -82,6 +83,12 @@ public class FriendRequestsAdapter extends RecyclerView.Adapter<FriendRequestsAd
             this.binding.notificationTextView.setText(friendRequest.senderName + "✌️");
             this.binding.dateTextView.setText(friendRequest.dateTime);
             this.binding.profileImageView.setImageBitmap(getUserImage(friendRequest.senderImage));
+            this.binding.profileImageView.setOnClickListener(v -> {
+                User user = new User();
+                user.id = friendRequest.senderId;
+                user.name = friendRequest.senderName;
+                friendRequestListener.onUserImageClicked(user);
+            });
 
             switch (status) {
                 case "pending":
