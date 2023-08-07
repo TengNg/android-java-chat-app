@@ -14,12 +14,14 @@ import com.example.myapplication.databinding.ActivityUserInfoBinding;
 import com.example.myapplication.models.User;
 import com.example.myapplication.utilities.Constant;
 import com.example.myapplication.utilities.PreferenceManager;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.protobuf.Api;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -290,10 +292,12 @@ public class UserInfoActivity extends AppCompatActivity {
 
             String senderId = this.preferenceManager.getString(Constant.KEY_USER_ID);
             String senderName = this.preferenceManager.getString(Constant.KEY_NAME);
+            String senderImage = this.preferenceManager.getString(Constant.KEY_IMAGE);
 
             HashMap<String, Object> friendRequestData = new HashMap<>();
             friendRequestData.put("senderId", senderId);
             friendRequestData.put("senderName", senderName);
+            friendRequestData.put("senderImage", senderImage);
             friendRequestData.put("receiverId", receiverId);
             friendRequestData.put("receiverName", receiverName);
             friendRequestData.put("status", "pending");

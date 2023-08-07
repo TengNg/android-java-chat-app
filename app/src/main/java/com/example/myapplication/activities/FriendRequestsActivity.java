@@ -3,7 +3,6 @@ package com.example.myapplication.activities;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -13,10 +12,8 @@ import com.example.myapplication.listeners.FriendRequestListener;
 import com.example.myapplication.models.FriendRequest;
 import com.example.myapplication.utilities.Constant;
 import com.example.myapplication.utilities.PreferenceManager;
-import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -85,6 +82,7 @@ public class FriendRequestsActivity extends AppCompatActivity implements FriendR
                     friendRequest.receiverName = document.getDocument().getString(Constant.KEY_RECEIVER_NAME);
                     friendRequest.senderId = document.getDocument().getString(Constant.KEY_SENDER_ID);
                     friendRequest.senderName = document.getDocument().getString(Constant.KEY_SENDER_NAME);
+                    friendRequest.senderImage = document.getDocument().getString(Constant.KEY_SENDER_IMAGE);
                     friendRequest.dateObject = document.getDocument().getDate(Constant.KEY_TIMESTAMP);
                     friendRequest.dateTime = getSimpleMessageDateTime(friendRequest.dateObject);
                     this.friendRequests.add(friendRequest);

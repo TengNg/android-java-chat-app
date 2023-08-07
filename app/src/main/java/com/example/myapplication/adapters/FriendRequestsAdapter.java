@@ -1,6 +1,9 @@
 package com.example.myapplication.adapters;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,6 +27,11 @@ public class FriendRequestsAdapter extends RecyclerView.Adapter<FriendRequestsAd
     public FriendRequestsAdapter(List<FriendRequest> friendRequests, FriendRequestListener friendRequestListener) {
         this.friendRequests = friendRequests;
         this.friendRequestListener = friendRequestListener;
+    }
+
+    private Bitmap getUserImage(String encodedImage){
+        byte[] bytes = Base64.decode(encodedImage, Base64.DEFAULT);
+        return BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
     }
 
     @NonNull
@@ -73,6 +81,7 @@ public class FriendRequestsAdapter extends RecyclerView.Adapter<FriendRequestsAd
 
             this.binding.notificationTextView.setText(friendRequest.senderName + "✌️");
             this.binding.dateTextView.setText(friendRequest.dateTime);
+            this.binding.profileImageView.setImageBitmap(getUserImage(friendRequest.senderImage));
 
             switch (status) {
                 case "pending":
@@ -91,6 +100,7 @@ public class FriendRequestsAdapter extends RecyclerView.Adapter<FriendRequestsAd
 
         void setAcceptedFriendRequest() {
             this.binding.getRoot().setBackgroundColor(Color.parseColor("#aff7b6"));
+//            this.binding.profileImageView.setImageBitmap();
             this.binding.acceptButton.setVisibility(View.GONE);
             this.binding.declineButton.setVisibility(View.GONE);
         }
