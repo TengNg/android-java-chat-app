@@ -40,7 +40,6 @@ public class FriendRequestsActivity extends AppCompatActivity implements FriendR
         setContentView(this.binding.getRoot());
         this.handleBackPressed();
         this.initialize();
-//        this.getFriendRequests();
         this.listenFriendRequests();
     }
 

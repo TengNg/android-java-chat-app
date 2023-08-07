@@ -69,6 +69,7 @@ public class NotificationActivity extends AppCompatActivity implements Notificat
                                 friendRequest.receiverId = document.getString(Constant.KEY_RECEIVER_ID);
                                 friendRequest.receiverName = document.getString(Constant.KEY_RECEIVER_NAME);
                                 friendRequest.senderId = document.getString(Constant.KEY_SENDER_ID);
+                                friendRequest.senderImage = document.getString(Constant.KEY_SENDER_IMAGE);
                                 friendRequest.senderName = document.getString(Constant.KEY_SENDER_NAME);
                                 friendRequest.dateObject = document.getDate(Constant.KEY_TIMESTAMP);
                                 friendRequest.dateTime = getSimpleMessageDateTime(friendRequest.dateObject);

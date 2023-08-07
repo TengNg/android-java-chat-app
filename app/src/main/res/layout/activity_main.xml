@@ -12,9 +12,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="gone"
-        >
-
+    >
         <LinearLayout
             android:id="@+id/frameLayout"
             android:layout_width="match_parent"
@@ -85,7 +83,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             app:menu="@menu/navigation_bottom_menu"/>
-    </RelativeLayout>>
+    </RelativeLayout>
 
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/nav_view"

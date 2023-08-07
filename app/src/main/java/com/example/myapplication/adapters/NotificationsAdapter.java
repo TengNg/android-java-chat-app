@@ -1,6 +1,9 @@
 package com.example.myapplication.adapters;
 
 import android.app.Notification;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +25,11 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
     public NotificationsAdapter(List<FriendRequest> notifications, NotificationListener notificationListener) {
         this.notifications = notifications;
         this.notificationListener = notificationListener;
+    }
+
+    private Bitmap getUserImage(String encodedImage){
+        byte[] bytes = Base64.decode(encodedImage, Base64.DEFAULT);
+        return BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
     }
 
     @NonNull
@@ -59,7 +67,7 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
 
             this.binding.notificationTextView.setText(msg);
             this.binding.dateTextView.setText(friendRequest.dateTime);
-
+            this.binding.profileImageView.setImageBitmap(getUserImage(friendRequest.senderImage));
             this.binding.getRoot().setOnClickListener(v -> notificationListener.onNotificationClicked());
         }
     }

@@ -15,6 +15,7 @@
         android:layout_height="wrap_content"
         android:textSize="20dp"
         android:textStyle="bold"
+        android:layout_marginStart="8dp"
         app:layout_constraintStart_toEndOf="@+id/profileImageView"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -23,6 +24,7 @@
         android:layout_width="150dp"
         android:layout_height="wrap_content"
         android:textSize="12dp"
+        android:layout_marginStart="8dp"
         app:layout_constraintBottom_toBottomOf="@+id/profileImageView"
         app:layout_constraintStart_toEndOf="@+id/profileImageView" />
 
@@ -32,8 +34,7 @@
         android:layout_height="50dp"
         android:background="@drawable/ic_accept"
         app:layout_constraintBottom_toBottomOf="@+id/dateTextView"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/notificationTextView"
+        app:layout_constraintEnd_toStartOf="@+id/declineButton"
         app:layout_constraintTop_toTopOf="@+id/notificationTextView" />
 
     <androidx.appcompat.widget.AppCompatImageView
@@ -43,20 +44,17 @@
         android:background="@drawable/ic_decline"
         app:layout_constraintBottom_toBottomOf="@+id/dateTextView"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/acceptButton"
-        app:layout_constraintTop_toTopOf="@+id/notificationTextView"
-        />
+        app:layout_constraintTop_toTopOf="@+id/notificationTextView" />
 
     <com.makeramen.roundedimageview.RoundedImageView
         android:id="@+id/profileImageView"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
         android:background="@drawable/bg_image"
         android:scaleType="centerCrop"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:riv_oval="true" />
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>
