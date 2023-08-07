@@ -3,7 +3,10 @@ package com.example.myapplication.activities;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 
@@ -51,10 +54,21 @@ public class ChatActivity extends AppCompatActivity {
         listenFriendActiveStatus();
     }
 
+    private Bitmap getUserImage(String encodedImage){
+        byte[] bytes = Base64.decode(encodedImage, Base64.DEFAULT);
+        return BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+    }
+
     private void initialize() {
         this.preferenceManager = new PreferenceManager(getApplicationContext());
         this.chatMessages = new ArrayList<>();
-        this.chatAdapter = new ChatAdapter(this.chatMessages, preferenceManager.getString(Constant.KEY_USER_ID));
+        this.receiver = (User) getIntent().getSerializableExtra(Constant.KEY_USER);
+        this.chatAdapter = new ChatAdapter(
+                this.chatMessages,
+                this.preferenceManager.getString(Constant.KEY_USER_ID),
+                this.getUserImage(this.preferenceManager.getString(Constant.KEY_IMAGE)),
+                this.getUserImage(this.receiver.image)
+        );
         this.binding.chatRecyclerView.setAdapter(chatAdapter);
         this.db = FirebaseFirestore.getInstance();
     }
@@ -169,7 +183,6 @@ public class ChatActivity extends AppCompatActivity {
     };
 
     private void getReceiverInfo() {
-        this.receiver = (User) getIntent().getSerializableExtra(Constant.KEY_USER);
         this.binding.usernameTextView.setText(this.receiver.name);
 
         this.binding.imageInfo.setOnClickListener(v -> {

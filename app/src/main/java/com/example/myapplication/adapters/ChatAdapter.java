@@ -1,5 +1,8 @@
 package com.example.myapplication.adapters;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
@@ -18,9 +21,14 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private static final int TYPE_SENT = 1;
     private static final int TYPE_RECEIVED = 2;
 
-    public ChatAdapter(List<ChatMessage> chatMessages, String senderId) {
+    private final Bitmap senderImage;
+    private final Bitmap receiverImage;
+
+    public ChatAdapter(List<ChatMessage> chatMessages, String senderId, Bitmap senderImage, Bitmap receiverImage) {
         this.chatMessages = chatMessages;
         this.senderId = senderId;
+        this.senderImage = senderImage;
+        this.receiverImage = receiverImage;
     }
 
     @NonNull
@@ -47,9 +55,9 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         if (getItemViewType(position) == TYPE_SENT) {
-            ((SentMessageViewHolder) holder).setData(chatMessages.get(position));
+            ((SentMessageViewHolder) holder).setData(chatMessages.get(position), senderImage);
         } else {
-            ((ReceivedMessageViewHolder) holder).setData(chatMessages.get(position));
+            ((ReceivedMessageViewHolder) holder).setData(chatMessages.get(position), receiverImage);
         }
     }
 
@@ -74,10 +82,11 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             this.binding = itemContainerSentMessageBinding;
         }
 
-        public void setData(ChatMessage chatMessage) {
+        public void setData(ChatMessage chatMessage, Bitmap image) {
             this.binding.usernameTextView.setText(chatMessage.senderName);
             this.binding.messageTextView.setText(chatMessage.message);
             this.binding.dateTimeTextView.setText(chatMessage.dateTime);
+            this.binding.profileImageView.setImageBitmap(image);
         }
     }
 
@@ -89,10 +98,11 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             this.binding = itemContainerReceivedMessageBinding;
         }
 
-        public void setData(ChatMessage chatMessage) {
+        public void setData(ChatMessage chatMessage, Bitmap image) {
             this.binding.usernameTextView.setText(chatMessage.receiverName);
             this.binding.messageTextView.setText(chatMessage.message);
             this.binding.dateTimeTextView.setText(chatMessage.dateTime);
+            this.binding.profileImageView.setImageBitmap(image);
         }
     }
 }

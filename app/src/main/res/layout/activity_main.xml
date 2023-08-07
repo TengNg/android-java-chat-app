@@ -49,4 +49,16 @@
 
     </LinearLayout>
 
+    <TextView
+        android:id="@+id/conversationsTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Conversations"
+        android:textStyle="bold"
+        android:textSize="20dp"
+        android:layout_marginStart="32dp"
+        app:layout_constraintBottom_toBottomOf="@+id/profileImage"
+        app:layout_constraintStart_toEndOf="@+id/profileImage"
+        app:layout_constraintTop_toTopOf="@+id/profileImage" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
