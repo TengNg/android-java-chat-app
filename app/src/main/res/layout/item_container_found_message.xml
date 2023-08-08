@@ -17,7 +17,7 @@
         android:maxLines="1"
         android:maxLength="30"
         android:textSize="20dp"
-        android:textStyle=""
+        android:textStyle="bold"
         android:text="User"
         app:layout_constraintStart_toEndOf="@+id/profileImageView"
         app:layout_constraintTop_toTopOf="parent" />

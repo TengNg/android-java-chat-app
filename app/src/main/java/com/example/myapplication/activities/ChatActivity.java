@@ -1,5 +1,6 @@
 package com.example.myapplication.activities;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -23,6 +24,7 @@ import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -41,6 +43,7 @@ public class ChatActivity extends AppCompatActivity {
     private PreferenceManager preferenceManager;
     private FirebaseFirestore db;
     private String conversationId;
+    private static final int REQUEST_EDIT = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +58,17 @@ public class ChatActivity extends AppCompatActivity {
         handleShowSearchInConversation();
         listenMessages();
         listenFriendActiveStatus();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_EDIT && resultCode == RESULT_OK) {
+            if (data != null) {
+                String editedData = data.getStringExtra("comingFromActivity");
+                Log.d("ComingFromActivity", editedData);
+            }
+        }
     }
 
     private Bitmap getUserImage(String encodedImage){
@@ -167,12 +181,16 @@ public class ChatActivity extends AppCompatActivity {
             this.chatMessages.sort(Comparator.comparing(o -> o.dateObject));
 
             if (nMessages == 0) {
-                // TODO: handle if from SearchInConversationActivity (get chat position from that)
                 chatAdapter.notifyDataSetChanged();
+                if (getIntent().hasExtra("comingFromActivity")) {
+                    int scrollPosition = (int) getIntent().getSerializableExtra("scrollToPosition");
+                    this.binding.chatRecyclerView.scrollToPosition(scrollPosition);
+                }
             } else {
                 chatAdapter.notifyItemRangeInserted(this.chatMessages.size(), this.chatMessages.size());
-                this.binding.chatRecyclerView.scrollToPosition(1);
+                this.binding.chatRecyclerView.smoothScrollToPosition(this.chatMessages.size() - 1);
             }
+
             this.binding.chatRecyclerView.setVisibility(View.VISIBLE);
         }
 
@@ -198,8 +216,10 @@ public class ChatActivity extends AppCompatActivity {
 
     private void handleShowSearchInConversation() {
         this.binding.imageSearch.setOnClickListener(v -> {
-            Intent intent = new Intent(getApplicationContext(), SearchInConversationActivity.class);
-            startActivity(intent);
+            Intent intent = new Intent(ChatActivity.this, SearchInConversationActivity.class);
+            intent.putExtra("chatMessages", (Serializable) this.chatMessages);
+            intent.putExtra(Constant.KEY_USER, this.receiver);
+            startActivityForResult(intent, REQUEST_EDIT);
         });
     }
 

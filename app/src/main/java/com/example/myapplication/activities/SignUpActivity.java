@@ -123,6 +123,7 @@ public class SignUpActivity extends AppCompatActivity {
                             this.preferenceManager.putBoolean(Constant.KEY_IS_SIGNED_IN, true);
                             this.preferenceManager.putString(Constant.KEY_USER_ID, newUserRef.getId());
                             this.preferenceManager.putString(Constant.KEY_NAME, binding.signUpUsernameInput.getText().toString());
+                            this.preferenceManager.putString(Constant.KEY_EMAIL, binding.signUpEmailInput.getText().toString());
                             this.preferenceManager.putString(Constant.KEY_IMAGE, this.encodedImage);
                             Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

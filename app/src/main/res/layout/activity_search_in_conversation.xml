@@ -23,7 +23,6 @@
         android:layout_width="30dp"
         android:layout_height="30dp"
         android:layout_marginStart="32dp"
-
         android:background="@drawable/bg_image"
         android:scaleType="centerCrop"
         app:layout_constraintBottom_toBottomOf="@+id/backButton"
@@ -44,11 +43,36 @@
         app:layout_constraintStart_toEndOf="@+id/profileImageView"
         app:layout_constraintTop_toTopOf="@+id/backButton" />
 
+    <EditText
+        android:id="@+id/searchInput"
+        android:layout_width="0dp"
+        android:layout_height="45dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/back_with_border"
+        android:hint="Search in this conversation"
+        android:imeOptions="actionDone"
+        android:inputType="text"
+        android:paddingStart="16dp"
+        android:paddingRight="10dp"
+        android:textSize="16dp"
+        app:layout_constraintEnd_toStartOf="@+id/imageSearch"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/usernameTextView" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/imageSearch"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:layout_marginEnd="16dp"
+        android:background="@drawable/ic_search"
+        app:layout_constraintBottom_toTopOf="@+id/foundMessagesRecyclerView"
+        app:layout_constraintEnd_toEndOf="parent" />
+
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/chatRecyclerView"
+        android:id="@+id/foundMessagesRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="16dp"
         android:background="#FFFFFF"
         android:orientation="vertical"
         android:overScrollMode="never"
@@ -57,8 +81,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/usernameTextView"
-        />
+        app:layout_constraintTop_toBottomOf="@+id/searchInput" />
 
     <ProgressBar
         android:id="@+id/progressCircular"

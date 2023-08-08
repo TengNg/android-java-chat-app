@@ -7,9 +7,13 @@
             android:title="@string/nav_home"
             android:icon="@drawable/ic_baseline_home_24"/>
 
-        <item android:id="@+id/nav_friends"
-            android:title="@string/nav_friends"
+        <item android:id="@+id/nav_contacts"
+            android:title="@string/nav_contacts"
             android:icon="@drawable/ic_contacts"/>
+
+        <item android:id="@+id/nav_find_friends"
+            android:title="@string/nav_find_friends"
+            android:icon="@drawable/ic_add_friend"/>
 
     </group>
 

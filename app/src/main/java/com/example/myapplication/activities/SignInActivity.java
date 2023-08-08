@@ -62,6 +62,7 @@ public class SignInActivity extends AppCompatActivity {
                         this.preferenceManager.putBoolean(Constant.KEY_IS_SIGNED_IN, true);
                         this.preferenceManager.putString(Constant.KEY_USER_ID, documentSnapshot.getId());
                         this.preferenceManager.putString(Constant.KEY_NAME, documentSnapshot.getString(Constant.KEY_NAME));
+                        this.preferenceManager.putString(Constant.KEY_EMAIL, documentSnapshot.getString(Constant.KEY_EMAIL));
                         this.preferenceManager.putString(Constant.KEY_IMAGE, documentSnapshot.getString(Constant.KEY_IMAGE));
 
                         db.collection(Constant.KEY_COLLECTION_USERS)

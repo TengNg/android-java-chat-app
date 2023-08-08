@@ -43,6 +43,7 @@
         android:paddingStart="16dp"
         android:paddingRight="10dp"
         android:textSize="16dp"
+        android:maxLines="1"
         android:layout_margin="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

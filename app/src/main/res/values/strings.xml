@@ -2,7 +2,8 @@
     <string name="app_name">HOME</string>
     <!-- to toggle the open close button of the navigation drawer -->
     <string name="nav_home">Home</string>
-    <string name="nav_friends">Friends</string>
+    <string name="nav_contacts">Contacts</string>
+    <string name="nav_find_friends">Find Friends</string>
     <string name="nav_profile">Profile</string>
     <string name="nav_account">Account</string>
     <string name="nav_logout">Log Out</string>

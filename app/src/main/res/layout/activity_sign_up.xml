@@ -1,140 +1,155 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activities.SignUpActivity">
+    android:background="@drawable/background_page"
+    android:gravity="center"
+    android:orientation="vertical"
+    tools:context="com.example.myapplication.activities.SignUpActivity">
 
-    <LinearLayout
-        android:id="@+id/LoginPageWrapper"
+    <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="32dp"
-        android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <TextView
-            android:id="@+id/loginWelcomeTextView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:textSize="20dp"
-            android:textStyle="bold"
-            android:text="Create your new account!" />
+        android:layout_height="wrap_content"
+        android:layout_margin="30dp"
+        app:cardCornerRadius="30dp"
+        app:cardElevation="20dp">
 
         <LinearLayout
-            android:id="@+id/linearLayout3"
+            android:id="@+id/LoginPageWrapper"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center"
+            android:layout_height="703dp"
+            android:layout_gravity="center_horizontal"
+            android:background="@drawable/custom_edittext"
             android:orientation="vertical"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            >
+            android:padding="24dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Create New Account"
+                android:textAlignment="center"
+                android:textColor="@color/red"
+                android:textSize="25sp"
+                android:textStyle="bold" />
 
             <FrameLayout
                 android:id="@+id/addImageLayout"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:padding="15dp">
+
                 <com.makeramen.roundedimageview.RoundedImageView
                     android:id="@+id/profileImage"
-                    android:layout_width="100dp"
-                    android:layout_height="100dp"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:layout_gravity="center"
+                    android:background="@drawable/bg_image"
                     android:scaleType="centerCrop"
-                    app:riv_oval="true"
-                    android:background="@drawable/bg_image" />
+                    app:riv_oval="true" />
+
                 <TextView
                     android:id="@+id/addImageTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="2dp"
                     android:text="Add image"
-                    android:layout_gravity="center" />
+                    android:textSize="12dp" />
             </FrameLayout>
 
             <EditText
                 android:id="@+id/signUpUsernameInput"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:ems="10"
-                android:hint="Name"
-                android:inputType="text" />
+                android:layout_height="50dp"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/custom_edittext"
+                android:drawableLeft="@drawable/ic_person"
+                android:drawablePadding="8dp"
+                android:hint="UserName"
+                android:padding="8dp"
+                android:textColor="@color/black" />
 
             <EditText
                 android:id="@+id/signUpEmailInput"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:ems="10"
+                android:layout_height="50dp"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/custom_edittext"
+                android:drawableLeft="@drawable/ic_baseline_email_24"
+                android:drawablePadding="8dp"
                 android:hint="Email"
-                android:inputType="text" />
+                android:padding="8dp"
+                android:textColor="@color/black" />
 
             <EditText
                 android:id="@+id/signUpPasswordInput"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:autofillHints=""
-                android:ems="10"
+                android:layout_height="50dp"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/custom_edittext"
+                android:drawableLeft="@drawable/ic_baseline_lock_24"
+                android:drawablePadding="8dp"
                 android:hint="Password"
-                android:inputType="textPassword" />
+                android:padding="8dp"
+                android:textColor="@color/black" />
 
             <EditText
                 android:id="@+id/signUpConfirmPasswordInput"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:autofillHints=""
-                android:ems="10"
+                android:layout_height="50dp"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/custom_edittext"
+                android:drawableLeft="@drawable/ic_baseline_lock_24"
+                android:drawablePadding="8dp"
                 android:hint="Confirm Password"
-                android:inputType="textPassword" />
+                android:padding="8dp"
+                android:textColor="@color/black" />
 
-            <LinearLayout
+            <RadioGroup
+                android:id="@+id/genderRadioGroup"
                 android:layout_width="match_parent"
-                android:layout_height="126dp"
-                android:orientation="vertical">
+                android:layout_height="wrap_content">
 
-                <RadioGroup
-                    android:id="@+id/genderRadioGroup"
+                <RadioButton
+                    android:id="@+id/maleRadioButton"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:text="Male" />
 
-                    <RadioButton
-                        android:id="@+id/maleRadioButton"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Male" />
-
-                    <RadioButton
-                        android:id="@+id/femaleRadioButton"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Female" />
-                </RadioGroup>
-
-            </LinearLayout>
+                <RadioButton
+                    android:id="@+id/femaleRadioButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Female" />
+            </RadioGroup>
 
             <Button
                 android:id="@+id/signUpButton"
-                android:layout_height="wrap_content"
-                android:layout_width="127dp"
-                android:layout_marginTop="20dp"
-                android:text="Sign Up" />
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:layout_marginTop="5dp"
+                android:backgroundTint="@color/blue"
+                android:text="Sign Up"
+                android:textSize="18dp"
+                android:textStyle="bold"
+                app:cornerRadius="15dp" />
 
             <TextView
                 android:id="@+id/signInTextView"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Already have an account? Login"
-                android:textColor="#3F51B5"
-                android:textStyle="bold" />
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:layout_marginTop="10dp"
+                android:padding="10dp"
+                android:text="Already have a account? Login"
+                android:textColor="@color/black"
+                android:textSize="13sp" />
 
         </LinearLayout>
 
-    </LinearLayout>
+    </androidx.cardview.widget.CardView>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>

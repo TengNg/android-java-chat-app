@@ -20,7 +20,6 @@
             android:exported="false" />
         <activity
             android:name=".activities.MainActivity"
-            android:theme="@style/Theme.MyApplication.NoActionBar"
             android:exported="false" />
         <activity
             android:name=".activities.BaseActivity"

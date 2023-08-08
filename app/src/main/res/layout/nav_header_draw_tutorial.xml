@@ -12,12 +12,16 @@
     android:paddingBottom="16dp"
     android:theme="@style/ThemeOverlay.AppCompat.Dark">
 
-    <ImageView
+    <com.makeramen.roundedimageview.RoundedImageView
         android:id="@+id/nav_header_image"
-        android:layout_width="56dp"
-        android:layout_height="56dp"
-        android:contentDescription="@string/profile_picture"
-        android:src="@drawable/ic_profile"/>
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:background="@drawable/bg_image"
+        android:scaleType="centerCrop"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:riv_oval="true" />
 
     <TextView
         android:id="@+id/nav_header_name"
