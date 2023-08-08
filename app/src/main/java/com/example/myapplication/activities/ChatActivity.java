@@ -25,6 +25,8 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
@@ -50,6 +52,7 @@ public class ChatActivity extends AppCompatActivity {
         handleBackPressed();
         handleSendMessage();
         handleShowUserInfo();
+        handleShowSearchInConversation();
         listenMessages();
         listenFriendActiveStatus();
     }
@@ -106,14 +109,11 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     private void listenMessages() {
+        String senderId = this.preferenceManager.getString(Constant.KEY_USER_ID);
+        String receiverId = this.receiver.id;
         db.collection(Constant.KEY_COLLECTION_CHAT)
-                .whereEqualTo(Constant.KEY_SENDER_ID, preferenceManager.getString(Constant.KEY_USER_ID))
-                .whereEqualTo(Constant.KEY_RECEIVER_ID, receiver.id)
-                .addSnapshotListener(eventListener);
-
-        db.collection(Constant.KEY_COLLECTION_CHAT)
-                .whereEqualTo(Constant.KEY_SENDER_ID, receiver.id)
-                .whereEqualTo(Constant.KEY_RECEIVER_ID, preferenceManager.getString(Constant.KEY_USER_ID))
+                .whereIn(Constant.KEY_SENDER_ID, Arrays.asList(senderId, receiverId))
+                .whereIn(Constant.KEY_RECEIVER_ID, Arrays.asList(senderId, receiverId))
                 .addSnapshotListener(eventListener);
     }
 
@@ -159,18 +159,19 @@ public class ChatActivity extends AppCompatActivity {
                     c.senderId = documentChange.getDocument().getString(Constant.KEY_SENDER_ID);
                     c.receiverId = documentChange.getDocument().getString(Constant.KEY_RECEIVER_ID);
                     c.message = documentChange.getDocument().getString(Constant.KEY_MESSAGE);
-                    c.dateTime = getSimpleMessageDateTime(documentChange.getDocument().getDate(Constant.KEY_TIMESTAMP));
                     c.dateObject = documentChange.getDocument().getDate(Constant.KEY_TIMESTAMP);
+                    c.dateTime = getSimpleMessageDateTime(c.dateObject, new Date());
                     this.chatMessages.add(c);
                 }
             }
             this.chatMessages.sort(Comparator.comparing(o -> o.dateObject));
 
             if (nMessages == 0) {
+                // TODO: handle if from SearchInConversationActivity (get chat position from that)
                 chatAdapter.notifyDataSetChanged();
             } else {
                 chatAdapter.notifyItemRangeInserted(this.chatMessages.size(), this.chatMessages.size());
-                this.binding.chatRecyclerView.smoothScrollToPosition(this.chatMessages.size() - 1);
+                this.binding.chatRecyclerView.scrollToPosition(1);
             }
             this.binding.chatRecyclerView.setVisibility(View.VISIBLE);
         }
@@ -184,18 +185,20 @@ public class ChatActivity extends AppCompatActivity {
 
     private void getReceiverInfo() {
         this.binding.usernameTextView.setText(this.receiver.name);
+        this.binding.profileImageView.setImageBitmap(getUserImage(this.receiver.image));
+    }
 
-        this.binding.imageInfo.setOnClickListener(v -> {
+    private void handleShowUserInfo() {
+        this.binding.profileImageView.setOnClickListener(v -> {
             Intent intent = new Intent(getApplicationContext(), UserInfoActivity.class);
             intent.putExtra(Constant.KEY_USER, this.receiver);
             startActivity(intent);
         });
     }
 
-    private void handleShowUserInfo() {
-        this.binding.imageInfo.setOnClickListener(v -> {
-            Intent intent = new Intent(getApplicationContext(), UserInfoActivity.class);
-            intent.putExtra(Constant.KEY_USER, this.receiver);
+    private void handleShowSearchInConversation() {
+        this.binding.imageSearch.setOnClickListener(v -> {
+            Intent intent = new Intent(getApplicationContext(), SearchInConversationActivity.class);
             startActivity(intent);
         });
     }
@@ -206,6 +209,32 @@ public class ChatActivity extends AppCompatActivity {
 
     private String getSimpleMessageDateTime(Date date) {
         return new SimpleDateFormat("MMMM dd, yyyy - hh:mm a", Locale.getDefault()).format(date);
+    }
+
+    private String getSimpleMessageDateTime(Date date1, Date date2) {
+        Calendar calendar1 = Calendar.getInstance();
+        calendar1.setTime(date1);
+
+        Calendar calendar2 = Calendar.getInstance();
+        calendar2.setTime(date2);
+
+        int year1 = calendar1.get(Calendar.YEAR);
+        int month1 = calendar1.get(Calendar.MONTH);
+        int day1 = calendar1.get(Calendar.DAY_OF_MONTH);
+
+        int year2 = calendar2.get(Calendar.YEAR);
+        int month2 = calendar2.get(Calendar.MONTH);
+        int day2 = calendar2.get(Calendar.DAY_OF_MONTH);
+
+        if (year1 == year2 && month1 == month2 && day1 == day2) {
+            return new SimpleDateFormat("hh:mm a", Locale.getDefault()).format(date1);
+        }
+
+        if (day2 - day1 == 1){
+            return "Yesterday" + ", " + new SimpleDateFormat("hh:mm a", Locale.getDefault()).format(date1);
+        }
+
+        return new SimpleDateFormat("MMMM dd, yyyy - hh:mm a", Locale.getDefault()).format(date1);
     }
 
     private void updateConversation(String message) {
@@ -223,22 +252,19 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     private void checkConversation() {
+        String senderId = this.preferenceManager.getString(Constant.KEY_USER_ID);
+        String receiverId = this.receiver.id;
         if (this.chatMessages.size() > 0) {
-            checkConversationById(this.preferenceManager.getString(Constant.KEY_USER_ID), receiver.id);
-            checkConversationById(receiver.id, this.preferenceManager.getString(Constant.KEY_USER_ID));
+            this.db.collection(Constant.KEY_COLLECTION_CONVERSATIONS)
+                    .whereIn(Constant.KEY_SENDER_ID, Arrays.asList(senderId, receiverId))
+                    .whereIn(Constant.KEY_RECEIVER_ID, Arrays.asList(senderId, receiverId))
+                    .get()
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful() && task.getResult() != null && task.getResult().getDocuments().size() > 0) {
+                            DocumentSnapshot documentSnapshot = task.getResult().getDocuments().get(0);
+                            this.conversationId = documentSnapshot.getId();
+                        }
+                    });
         }
-    }
-
-    private void checkConversationById(String senderId, String receiverId) {
-        this.db.collection(Constant.KEY_COLLECTION_CONVERSATIONS)
-                .whereEqualTo(Constant.KEY_SENDER_ID, senderId)
-                .whereEqualTo(Constant.KEY_RECEIVER_ID, receiverId)
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful() && task.getResult() != null && task.getResult().getDocuments().size() > 0) {
-                        DocumentSnapshot documentSnapshot = task.getResult().getDocuments().get(0);
-                        this.conversationId = documentSnapshot.getId();
-                    }
-                });
     }
 }

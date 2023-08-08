@@ -26,10 +26,14 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.messaging.FirebaseMessaging;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity implements ConversationsListener {
     List<ChatMessage> recentConversations;
@@ -119,6 +123,8 @@ public class MainActivity extends AppCompatActivity implements ConversationsList
                     }
                     chatMessage.message = documentChange.getDocument().getString(Constant.KEY_LAST_MESSAGE);
                     chatMessage.dateObject = documentChange.getDocument().getDate(Constant.KEY_TIMESTAMP);
+                    chatMessage.dateTime = getSimpleMessageDateTime(chatMessage.dateObject, new Date());
+
                     this.recentConversations.add(chatMessage);
                 } else if (documentChange.getType() == DocumentChange.Type.MODIFIED) {
                     String senderId = documentChange.getDocument().getString(Constant.KEY_SENDER_ID);
@@ -139,6 +145,36 @@ public class MainActivity extends AppCompatActivity implements ConversationsList
             this.binding.conversationsRecyclerView.setVisibility(View.VISIBLE);
         }
     };
+
+    private String getSimpleMessageDateTime(Date date) {
+        return new SimpleDateFormat("MMMM dd, yyyy - hh:mm a", Locale.getDefault()).format(date);
+    }
+
+    private String getSimpleMessageDateTime(Date date1, Date date2) {
+        Calendar calendar1 = Calendar.getInstance();
+        calendar1.setTime(date1);
+
+        Calendar calendar2 = Calendar.getInstance();
+        calendar2.setTime(date2);
+
+        int year1 = calendar1.get(Calendar.YEAR);
+        int month1 = calendar1.get(Calendar.MONTH);
+        int day1 = calendar1.get(Calendar.DAY_OF_MONTH);
+
+        int year2 = calendar2.get(Calendar.YEAR);
+        int month2 = calendar2.get(Calendar.MONTH);
+        int day2 = calendar2.get(Calendar.DAY_OF_MONTH);
+
+        if (year1 == year2 && month1 == month2 && day1 == day2) {
+            return new SimpleDateFormat("hh:mm a", Locale.getDefault()).format(date1);
+        }
+
+        if (day2 - day1 == 1){
+            return "Yesterday" + ", " + new SimpleDateFormat("hh:mm a", Locale.getDefault()).format(date1);
+        }
+
+        return new SimpleDateFormat("MMMM dd, yyyy - hh:mm a", Locale.getDefault()).format(date1);
+    }
 
     @Override
     public void onConversationClicked(User user) {

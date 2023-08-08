@@ -98,35 +98,6 @@ public class FriendRequestsActivity extends AppCompatActivity implements FriendR
         }
     };
 
-//    private void getFriendRequests() {
-//        this.db.collection(Constant.KEY_COLLECTION_FRIEND_REQUESTS)
-//                .whereEqualTo(Constant.KEY_RECEIVER_ID, this.preferenceManager.getString(Constant.KEY_USER_ID))
-//                .get()
-//                .addOnCompleteListener(task -> {
-//                    if (task.isSuccessful()) {
-//                        QuerySnapshot querySnapshot = task.getResult();
-//                        if (querySnapshot != null) {
-//                            for (DocumentSnapshot document : querySnapshot.getDocuments()) {
-//                                FriendRequest friendRequest = new FriendRequest();
-//                                friendRequest.id = document.getId();
-//                                friendRequest.status = document.getString(Constant.KEY_FRIEND_REQUEST_STATUS);
-//                                friendRequest.receiverId = document.getString(Constant.KEY_RECEIVER_ID);
-//                                friendRequest.receiverName = document.getString(Constant.KEY_RECEIVER_NAME);
-//                                friendRequest.senderId = document.getString(Constant.KEY_SENDER_ID);
-//                                friendRequest.senderName = document.getString(Constant.KEY_SENDER_NAME);
-//                                friendRequest.dateObject = document.getDate(Constant.KEY_TIMESTAMP);
-//                                friendRequest.dateTime = getSimpleMessageDateTime(friendRequest.dateObject);
-//                                this.friendRequests.add(friendRequest);
-//                                this.friendRequestsAdapter.notifyDataSetChanged();
-//                            }
-//                        }
-//                        this.binding.progressCircular.setVisibility(View.GONE);
-//                    } else {
-//                        Log.d("Error", "Can't get any notification");
-//                    }
-//                });
-//    }
-
     private String getSimpleMessageDateTime(Date date) {
         return new SimpleDateFormat("MMMM dd, yyyy - hh:mm a", Locale.getDefault()).format(date);
     }

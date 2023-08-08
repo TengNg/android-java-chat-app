@@ -15,34 +15,53 @@
         android:theme="@style/Theme.MyApplication"
         tools:targetApi="31">
         <activity
+            android:name=".activities.SearchInConversationActivity"
+            android:theme="@style/Theme.MyApplication.NoActionBar"
+            android:exported="false" />
+        <activity
             android:name=".activities.MainActivity"
+            android:theme="@style/Theme.MyApplication.NoActionBar"
             android:exported="false" />
         <activity
             android:name=".activities.BaseActivity"
             android:exported="false" />
         <activity
             android:name=".activities.FriendRequestsActivity"
+            android:theme="@style/Theme.MyApplication.NoActionBar"
             android:exported="false" />
         <activity
             android:name=".activities.NotificationActivity"
+            android:theme="@style/Theme.MyApplication.NoActionBar"
             android:exported="false" />
         <activity
             android:name=".activities.UsersActivity"
+            android:theme="@style/Theme.MyApplication.NoActionBar"
             android:exported="false" />
         <activity
             android:name=".activities.UserInfoActivity"
+            android:theme="@style/Theme.MyApplication.NoActionBar"
             android:exported="false" />
         <activity
             android:name=".activities.ChatActivity"
+            android:theme="@style/Theme.MyApplication.NoActionBar"
             android:exported="false" />
         <activity
             android:name=".activities.FriendsActivity"
+            android:theme="@style/Theme.MyApplication.NoActionBar"
             android:exported="false" />
         <activity
             android:name=".activities.SignUpActivity"
+            android:theme="@style/Theme.MyApplication.NoActionBar"
             android:exported="false" />
+
+        <activity
+            android:name=".activities.MenuActivity"
+            android:theme="@style/Theme.MyApplication.NoActionBar"
+            android:exported="false" />
+
         <activity
             android:name=".activities.SignInActivity"
+            android:theme="@style/Theme.MyApplication.NoActionBar"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -50,7 +69,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activities.MenuActivity" />
 
         <service
             android:name=".firebase.MessagingService"

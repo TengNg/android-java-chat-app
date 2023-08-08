@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:animateLayoutChanges="true"
+    android:background="#E3E3E3"
     tools:context=".activities.ChatActivity">
 
     <androidx.appcompat.widget.AppCompatImageView
@@ -18,11 +19,23 @@
         android:layout_marginTop="16dp"
     />
 
+    <com.makeramen.roundedimageview.RoundedImageView
+        android:id="@+id/profileImageView"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:background="@drawable/bg_image"
+        android:scaleType="centerCrop"
+        android:layout_marginStart="16dp"
+        app:layout_constraintBottom_toBottomOf="@+id/imageBack"
+        app:layout_constraintStart_toEndOf="@+id/imageBack"
+        app:layout_constraintTop_toTopOf="@+id/imageBack"
+        app:riv_oval="true" />
+
     <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/imageInfo"
+        android:id="@+id/imageSearch"
         android:layout_width="30dp"
         android:layout_height="30dp"
-        android:background="@drawable/ic_info"
+        android:background="@drawable/ic_search"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginTop="16dp"
@@ -31,30 +44,16 @@
 
     <TextView
         android:id="@+id/usernameTextView"
-        android:layout_width="200dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center"
         android:maxLines="1"
         android:text="Username"
         android:textSize="20dp"
+        android:layout_marginStart="8dp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@+id/imageBack"
-        app:layout_constraintStart_toEndOf="@+id/imageBack"
-        app:layout_constraintTop_toTopOf="@+id/imageBack"
-        app:layout_constraintVertical_bias="0.666" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/chatRecyclerView"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:orientation="vertical"
-        android:overScrollMode="never"
-        android:padding="20dp"
-        app:stackFromEnd="true"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        app:layout_constraintBottom_toTopOf="@+id/messageInput"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/usernameTextView" />
+        app:layout_constraintBottom_toBottomOf="@+id/profileImageView"
+        app:layout_constraintStart_toEndOf="@+id/profileImageView"
+        app:layout_constraintTop_toTopOf="@+id/profileImageView" />
 
     <EditText
         android:id="@+id/messageInput"
@@ -66,7 +65,7 @@
         android:background="@drawable/back_with_border"
         android:hint="type a message..."
         android:imeOptions="actionDone"
-        android:inputType="text"
+        android:inputType="textMultiLine"
         android:paddingStart="16dp"
         android:paddingRight="10dp"
         android:textSize="16dp"
@@ -86,14 +85,34 @@
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/activeStatusImage"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:layout_marginStart="8dp"
         android:background="@drawable/ic_active"
         android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="@+id/usernameTextView"
         app:layout_constraintStart_toEndOf="@+id/usernameTextView"
         app:layout_constraintTop_toTopOf="@+id/usernameTextView"
         />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/chatRecyclerView"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        android:overScrollMode="never"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        android:paddingBottom="-24dp"
+        android:background="#FFFFFF"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintBottom_toTopOf="@+id/messageInput"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/usernameTextView"
+        app:stackFromEnd="true" />
 
     <ProgressBar
         android:id="@+id/progressCircular"

@@ -58,6 +58,7 @@ public class RecentConversationsAdapter extends RecyclerView.Adapter<RecentConve
             this.binding.profileImageView.setImageBitmap(getConversationImage(chatMessage.conversationImage));
             this.binding.conversationNameTextView.setText(chatMessage.conversationName);
             this.binding.messageTextView.setText(chatMessage.message);
+            this.binding.dateTimeTextView.setText(chatMessage.dateTime);
             this.binding.getRoot().setOnClickListener(v -> {
                 User user = new User();
                 user.name = chatMessage.conversationName;
