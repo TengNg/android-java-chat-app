@@ -17,11 +17,18 @@ public class ChatMessage implements Serializable {
     public String conversationId;
     public String conversationName;
     public String conversationImage;
-    public int searchIndex;
+    public int searchIndex = -1;
+    public int highlightStartIndex;
+    public int highlightEndIndex;
+    public boolean isHighlighted;
 
     @NonNull
     @Override
     public String toString() {
-        return this.message + " - " + this.searchIndex;
+        return this.message + " - "
+                + this.searchIndex + " - "
+                + this.highlightStartIndex + " - "
+                + this.highlightEndIndex + " - "
+                + this.isHighlighted;
     }
 }

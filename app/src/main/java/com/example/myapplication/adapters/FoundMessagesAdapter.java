@@ -1,7 +1,11 @@
 package com.example.myapplication.adapters;
 
+import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Typeface;
+import android.text.SpannableString;
+import android.text.style.StyleSpan;
 import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
@@ -16,12 +20,13 @@ import com.example.myapplication.models.User;
 
 import java.util.List;
 
-public class FounderMessagesAdapter extends RecyclerView.Adapter<FounderMessagesAdapter.FoundMessageViewHolder> {
+public class FoundMessagesAdapter extends RecyclerView.Adapter<FoundMessagesAdapter.FoundMessageViewHolder> {
     private List<ChatMessage> chatMessages;
     private final FoundMessageListener foundMessageListener;
     private final User receiver;
+    private int highlightIndex = -1;
 
-    public FounderMessagesAdapter(List<ChatMessage> chatMessages, FoundMessageListener foundMessageListener, User receiver) {
+    public FoundMessagesAdapter(List<ChatMessage> chatMessages, FoundMessageListener foundMessageListener, User receiver) {
         this.chatMessages = chatMessages;
         this.foundMessageListener = foundMessageListener;
         this.receiver = receiver;
@@ -61,14 +66,25 @@ public class FounderMessagesAdapter extends RecyclerView.Adapter<FounderMessages
             this.binding = binding;
         }
 
+        @SuppressLint("SetTextI18n")
         public void setData(ChatMessage chatMessage, User user) {
             this.binding.profileImageView.setImageBitmap(getUserImage(user.image));
             this.binding.conversationNameTextView.setText(user.name);
-            this.binding.messageTextView.setText(chatMessage.message);
+
+            SpannableString spannableString = new SpannableString(chatMessage.message);
+            spannableString.setSpan(
+                    new StyleSpan(Typeface.BOLD),
+                    chatMessage.highlightStartIndex,
+                    chatMessage.highlightEndIndex,
+                    SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE
+            );
+
+            this.binding.messageTextView.setText(spannableString);
+
             this.binding.dateTimeTextView.setText(chatMessage.dateTime);
 
             this.binding.getRoot().setOnClickListener(v -> {
-                foundMessageListener.onFoundMessageClicked(chatMessage.searchIndex);
+                foundMessageListener.onFoundMessageClicked(chatMessage);
             });
         }
     }

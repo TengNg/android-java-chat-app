@@ -213,6 +213,14 @@ public class MainActivity extends AppCompatActivity implements ConversationsList
             return "Yesterday" + ", " + new SimpleDateFormat("hh:mm a", Locale.getDefault()).format(date1);
         }
 
+        if (day2 - day1 < 7) {
+            return new SimpleDateFormat("EEEE", Locale.getDefault()).format(date1);
+        }
+
+        if (day2 - day1 > 7) {
+            return new SimpleDateFormat("MMMM dd", Locale.getDefault()).format(date1);
+        }
+
         return new SimpleDateFormat("MMMM dd, yyyy - hh:mm a", Locale.getDefault()).format(date1);
     }
 

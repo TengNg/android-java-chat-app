@@ -6,10 +6,10 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.service.autofill.FieldClassification;
 import android.util.Base64;
-import android.util.Log;
 
-import com.example.myapplication.adapters.FounderMessagesAdapter;
+import com.example.myapplication.adapters.FoundMessagesAdapter;
 import com.example.myapplication.databinding.ActivitySearchInConversationBinding;
 import com.example.myapplication.listeners.FoundMessageListener;
 import com.example.myapplication.models.ChatMessage;
@@ -28,7 +28,17 @@ public class SearchInConversationActivity extends AppCompatActivity implements F
     private PreferenceManager preferenceManager;
     private FirebaseFirestore db;
     private User receiver;
-    private FounderMessagesAdapter founderMessagesAdapter;
+    private FoundMessagesAdapter foundMessagesAdapter;
+
+    static class MatchRange {
+        int startIndex;
+        int endIndex;
+
+        MatchRange(int startIndex, int endIndex) {
+            this.startIndex = startIndex;
+            this.endIndex = endIndex;
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,8 +57,8 @@ public class SearchInConversationActivity extends AppCompatActivity implements F
         this.chatMessages = (List<ChatMessage>) getIntent().getSerializableExtra("chatMessages");
         this.foundMessages = new ArrayList<>();
         this.db = FirebaseFirestore.getInstance();
-        this.founderMessagesAdapter = new FounderMessagesAdapter(this.foundMessages, this, this.receiver);
-        this.binding.foundMessagesRecyclerView.setAdapter(founderMessagesAdapter);
+        this.foundMessagesAdapter = new FoundMessagesAdapter(this.foundMessages, this, this.receiver);
+        this.binding.foundMessagesRecyclerView.setAdapter(foundMessagesAdapter);
     }
 
     private Bitmap getUserImage(String encodedImage){
@@ -62,6 +72,9 @@ public class SearchInConversationActivity extends AppCompatActivity implements F
     }
 
     private void getFilteredMessages() {
+        if (this.foundMessages.size() > 0)
+            this.foundMessages.clear();
+
         String searchStr = this.binding.searchInput.getText().toString();
 
         if (searchStr.isEmpty()) {
@@ -70,21 +83,44 @@ public class SearchInConversationActivity extends AppCompatActivity implements F
 
         int idx = 0;
         for (ChatMessage chatMessage : this.chatMessages) {
-            if(chatMessage.message.contains(searchStr)) {
+            String msg = chatMessage.message;
+            MatchRange matchRange = containsWord(searchStr, msg);
+            if (matchRange != null) {
                 chatMessage.searchIndex = idx;
+                chatMessage.highlightStartIndex = matchRange.startIndex;
+                chatMessage.highlightEndIndex = matchRange.endIndex;
                 this.foundMessages.add(chatMessage);
             }
             idx += 1;
         }
 
-        this.founderMessagesAdapter.notifyDataSetChanged();
+        this.foundMessagesAdapter.notifyDataSetChanged();
+    }
 
-        Log.d("SIC_Testing", foundMessages.toString());
+    private MatchRange containsWord(String target, String message) {
+        if (message.contains(target)) {
+            return new MatchRange(message.indexOf(target), target.length());
+        }
+
+        String[] wordsTarget = target.split("\\s+");
+        String[] wordsMsg = message.split("\\s+");
+        for (String wt : wordsTarget) {
+            for (String wm : wordsMsg) {
+                if (wt.equals(wm)) {
+                    int startIndex = message.indexOf(wt);
+                    int endIndex = startIndex + wt.length();
+                    return new MatchRange(startIndex, endIndex);
+                }
+            }
+        }
+
+        return null;
     }
 
     private void handleGetFilteredMessages() {
         this.binding.imageSearch.setOnClickListener(v -> {
             this.getFilteredMessages();
+            this.binding.searchInput.setText(null);
         });
     }
 
@@ -93,10 +129,11 @@ public class SearchInConversationActivity extends AppCompatActivity implements F
     }
 
     @Override
-    public void onFoundMessageClicked(int searchIndex) {
+    public void onFoundMessageClicked(ChatMessage chatMessage) {
         Intent intent = new Intent();
         intent.putExtra("comingFromActivity", "SIC_Activity");
-        intent.putExtra("scrollToPosition", searchIndex);
+        chatMessage.isHighlighted = true;
+        intent.putExtra("selectedMessage", chatMessage);
         setResult(RESULT_OK, intent);
         finish();
     }

@@ -1,6 +1,5 @@
 package com.example.myapplication.activities;
 
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -65,8 +64,16 @@ public class ChatActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_EDIT && resultCode == RESULT_OK) {
             if (data != null) {
-                String editedData = data.getStringExtra("comingFromActivity");
-                Log.d("ComingFromActivity", editedData);
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+                    ChatMessage chatMessage = data.getSerializableExtra("selectedMessage", ChatMessage.class);
+                    Log.d("SelectedMsg", chatMessage.toString());
+
+                    int stp = chatMessage.searchIndex;
+                    this.chatMessages.set(stp, chatMessage);
+                    this.chatAdapter.notifyItemChanged(stp);
+
+                    this.binding.chatRecyclerView.scrollToPosition(stp);
+                }
             }
         }
     }
@@ -182,12 +189,7 @@ public class ChatActivity extends AppCompatActivity {
 
             if (nMessages == 0) {
                 chatAdapter.notifyDataSetChanged();
-                if (getIntent().hasExtra("comingFromActivity")) {
-                    int scrollPosition = (int) getIntent().getSerializableExtra("scrollToPosition");
-                    this.binding.chatRecyclerView.scrollToPosition(scrollPosition);
-                }
             } else {
-                chatAdapter.notifyItemRangeInserted(this.chatMessages.size(), this.chatMessages.size());
                 this.binding.chatRecyclerView.smoothScrollToPosition(this.chatMessages.size() - 1);
             }
 

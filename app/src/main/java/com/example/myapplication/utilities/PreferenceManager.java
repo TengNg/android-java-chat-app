@@ -10,6 +10,14 @@ public class PreferenceManager {
         this.sharedPreferences = context.getSharedPreferences(Constant.KEY_PREFERENCE_NAME, Context.MODE_PRIVATE);
     }
 
+    public boolean contains(String key) { return this.sharedPreferences.contains(key); }
+
+    public void remove(String key) {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.remove(key);
+        editor.apply();
+    }
+
     public void putBoolean(String key, boolean value) {
         SharedPreferences.Editor editor = this.sharedPreferences.edit();
         editor.putBoolean(key, value);
@@ -28,6 +36,14 @@ public class PreferenceManager {
 
     public String getString(String key) {
         return this.sharedPreferences.getString(key, null);
+    }
+
+    public int getInt(String key) { return this.sharedPreferences.getInt(key, -1); }
+
+    public void putInt(String key, int value) {
+        SharedPreferences.Editor editor = this.sharedPreferences.edit();
+        editor.putInt(key, value);
+        editor.apply();
     }
 
     public void clear() {

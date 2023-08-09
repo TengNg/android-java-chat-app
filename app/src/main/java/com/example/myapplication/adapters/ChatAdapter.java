@@ -2,6 +2,12 @@ package com.example.myapplication.adapters;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.SpannableStringBuilder;
+import android.text.style.BackgroundColorSpan;
+import android.text.style.ForegroundColorSpan;
 import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
@@ -20,7 +26,6 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private final String senderId;
     private static final int TYPE_SENT = 1;
     private static final int TYPE_RECEIVED = 2;
-
     private final Bitmap senderImage;
     private final Bitmap receiverImage;
 
@@ -84,7 +89,21 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
         public void setData(ChatMessage chatMessage, Bitmap image) {
             this.binding.usernameTextView.setText(chatMessage.senderName);
-            this.binding.messageTextView.setText(chatMessage.message);
+
+            if (chatMessage.isHighlighted) {
+                Spannable wordToSpan = new SpannableString(chatMessage.message);
+                wordToSpan.setSpan(
+                        new BackgroundColorSpan(Color.YELLOW),
+                        chatMessage.highlightStartIndex,
+                        chatMessage.highlightEndIndex,
+                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                );
+                this.binding.messageTextView.setText(wordToSpan);
+            }
+            else {
+                this.binding.messageTextView.setText(chatMessage.message);
+            }
+
             this.binding.dateTimeTextView.setText(chatMessage.dateTime);
             this.binding.profileImageView.setImageBitmap(image);
         }
@@ -100,7 +119,20 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
         public void setData(ChatMessage chatMessage, Bitmap image) {
             this.binding.usernameTextView.setText(chatMessage.receiverName);
-            this.binding.messageTextView.setText(chatMessage.message);
+
+            if (chatMessage.isHighlighted) {
+                Spannable wordToSpan = new SpannableString(chatMessage.message);
+                wordToSpan.setSpan(
+                        new BackgroundColorSpan(Color.YELLOW),
+                        chatMessage.highlightStartIndex,
+                        chatMessage.highlightEndIndex,
+                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                );
+                this.binding.messageTextView.setText(wordToSpan);
+            } else {
+                this.binding.messageTextView.setText(chatMessage.message);
+            }
+
             this.binding.dateTimeTextView.setText(chatMessage.dateTime);
             this.binding.profileImageView.setImageBitmap(image);
         }
