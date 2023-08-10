@@ -11,9 +11,9 @@
         android:title="@string/nav_contacts" />
 
     <item
-        android:id="@+id/nav_notifications"
-        android:icon="@drawable/ic_notifications"
-        android:title="@string/nav_notifications" />
+        android:id="@+id/nav_friend_requests"
+        android:icon="@drawable/ic_groups"
+        android:title="@string/nav_friend_requests" />
 
     <!-- Add other menu items here -->
 </menu>

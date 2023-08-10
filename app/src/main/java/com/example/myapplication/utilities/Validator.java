@@ -12,7 +12,11 @@ public class Validator {
     }
 
     public static boolean isValidPassword(String password) {
-        String regex = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z]).{8, 20}$";
+        // (?=.*[0-9]) ==> a digit must occur at least once
+        // (?=.*[a-z]) ==> a lower case character must occur at least once
+        // (?=.*[0-9]) ==> a upper case character must occur at least once
+        // .{5,10}     ==> password length [min:5, max:10]
+        String regex = "(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z]).{5,10}";
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(password);
         return matcher.matches();

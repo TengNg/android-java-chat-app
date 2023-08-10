@@ -27,6 +27,7 @@ import com.example.myapplication.models.ChatMessage;
 import com.example.myapplication.models.User;
 import com.example.myapplication.utilities.Constant;
 import com.example.myapplication.utilities.PreferenceManager;
+import com.google.android.material.badge.BadgeDrawable;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.firestore.DocumentChange;
@@ -71,6 +72,8 @@ public class MainActivity extends AppCompatActivity implements ConversationsList
         this.setupNavBottomView();
 
         this.listenConversations();
+        this.listenFriendRequestsCount();
+
         this.handleOpenMenu();
     }
 
@@ -224,8 +227,33 @@ public class MainActivity extends AppCompatActivity implements ConversationsList
         return new SimpleDateFormat("MMMM dd, yyyy - hh:mm a", Locale.getDefault()).format(date1);
     }
 
+    private void listenFriendRequestsCount() {
+        this.db.collection(Constant.KEY_COLLECTION_FRIEND_REQUESTS)
+                .whereEqualTo(Constant.KEY_RECEIVER_ID, this.preferenceManager.getString(Constant.KEY_USER_ID))
+                .whereEqualTo(Constant.KEY_FRIEND_REQUEST_STATUS, "pending")
+                .addSnapshotListener(friendRequestsCountEventListener);
+    }
+
+    private final EventListener<QuerySnapshot> friendRequestsCountEventListener = (value, error) -> {
+        if (error != null) {
+            return;
+        }
+
+        if (value != null) {
+            BadgeDrawable badgeDrawable = this.bottomNavigationView.getOrCreateBadge(R.id.nav_friend_requests);
+            long requestCount = value.size();
+            if (requestCount == 0) {
+                this.bottomNavigationView.removeBadge(R.id.nav_friend_requests);
+                badgeDrawable.clearNumber();
+            } else {
+                badgeDrawable.setNumber((int) requestCount);
+            }
+        }
+    };
+
     private void setupNavBottomView() {
         bottomNavigationView = findViewById(R.id.nav_bottom);
+
         bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
             int id = item.getItemId();
             if (id == R.id.nav_home) {
@@ -236,7 +264,7 @@ public class MainActivity extends AppCompatActivity implements ConversationsList
                     startActivity(new Intent(this, FriendsActivity.class));
                     return true;
                 }
-            } else if (id == R.id.nav_notifications) {
+            } else if (id == R.id.nav_friend_requests) {
                 startActivity(new Intent(this, NotificationActivity.class));
                 return true;
             }
