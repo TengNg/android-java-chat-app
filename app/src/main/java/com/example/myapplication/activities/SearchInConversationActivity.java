@@ -1,12 +1,12 @@
 package com.example.myapplication.activities;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.service.autofill.FieldClassification;
 import android.util.Base64;
 
 import com.example.myapplication.adapters.FoundMessagesAdapter;
@@ -19,6 +19,7 @@ import com.example.myapplication.utilities.PreferenceManager;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public class SearchInConversationActivity extends AppCompatActivity implements FoundMessageListener {
@@ -30,13 +31,19 @@ public class SearchInConversationActivity extends AppCompatActivity implements F
     private User receiver;
     private FoundMessagesAdapter foundMessagesAdapter;
 
-    static class MatchRange {
+    private static class MatchRange {
         int startIndex;
         int endIndex;
 
         MatchRange(int startIndex, int endIndex) {
             this.startIndex = startIndex;
             this.endIndex = endIndex;
+        }
+
+        @NonNull
+        @Override
+        public String toString() {
+            return this.startIndex + " - " + this.endIndex + "\n";
         }
     }
 
@@ -94,12 +101,14 @@ public class SearchInConversationActivity extends AppCompatActivity implements F
             idx += 1;
         }
 
+        this.chatMessages.sort(Comparator.comparing(o -> o.dateObject, Comparator.reverseOrder()));
+
         this.foundMessagesAdapter.notifyDataSetChanged();
     }
 
     private MatchRange containsWord(String target, String message) {
         if (message.contains(target)) {
-            return new MatchRange(message.indexOf(target), target.length());
+            return new MatchRange(message.indexOf(target), message.indexOf(target) + target.length());
         }
 
         String[] wordsTarget = target.split("\\s+");
@@ -125,7 +134,9 @@ public class SearchInConversationActivity extends AppCompatActivity implements F
     }
 
     private void handleBackPressed() {
-        this.binding.backButton.setOnClickListener(v -> onBackPressed());
+        this.binding.backButton.setOnClickListener(v -> {
+            onBackPressed();
+        });
     }
 
     @Override

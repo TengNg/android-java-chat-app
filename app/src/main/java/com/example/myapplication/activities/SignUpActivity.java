@@ -17,6 +17,7 @@ import android.widget.Toast;
 import com.example.myapplication.databinding.ActivitySignUpBinding;
 import com.example.myapplication.utilities.Constant;
 import com.example.myapplication.utilities.PreferenceManager;
+import com.example.myapplication.utilities.Validator;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -178,6 +179,11 @@ public class SignUpActivity extends AppCompatActivity {
 
         if (this.binding.genderRadioGroup.getCheckedRadioButtonId() == -1) {
             showToast("Select your gender");
+            return false;
+        }
+
+        if (Validator.isValidPassword(this.binding.signUpPasswordInput.getText().toString())) {
+            showToast("Password must contain lowercase/uppercase characters and digits");
             return false;
         }
 
