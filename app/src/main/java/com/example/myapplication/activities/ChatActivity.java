@@ -1,6 +1,7 @@
 package com.example.myapplication.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -44,6 +45,8 @@ public class ChatActivity extends AppCompatActivity {
     private String conversationId;
     private static final int REQUEST_EDIT = 1;
 
+    private ChatMessage selectedMessageFromSIC;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,8 +58,11 @@ public class ChatActivity extends AppCompatActivity {
         handleSendMessage();
         handleShowUserInfo();
         handleShowSearchInConversation();
+        handleScrollToRecent();
         listenMessages();
         listenFriendActiveStatus();
+
+        handleChatRecyclerViewOnScrolled();
     }
 
     @Override
@@ -65,11 +71,11 @@ public class ChatActivity extends AppCompatActivity {
         if (requestCode == REQUEST_EDIT && resultCode == RESULT_OK) {
             if (data != null) {
                 if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
-                    ChatMessage chatMessage = data.getSerializableExtra("selectedMessage", ChatMessage.class);
-                    Log.d("SelectedMsg", chatMessage.toString());
+                    this.selectedMessageFromSIC = data.getSerializableExtra("selectedMessage", ChatMessage.class);
+                    Log.d("SelectedMsg", selectedMessageFromSIC.toString());
 
-                    int stp = chatMessage.searchIndex;
-                    this.chatMessages.set(stp, chatMessage);
+                    int stp = selectedMessageFromSIC.searchIndex;
+                    this.chatMessages.set(stp, selectedMessageFromSIC);
                     this.chatAdapter.notifyItemChanged(stp);
 
                     this.binding.chatRecyclerView.scrollToPosition(stp);
@@ -216,9 +222,33 @@ public class ChatActivity extends AppCompatActivity {
         });
     }
 
+    private void handleChatRecyclerViewOnScrolled() {
+        this.binding.chatRecyclerView.addOnScrollListener(
+                new RecyclerView.OnScrollListener() {
+                    @Override
+                    public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                        int totalScrollRange = recyclerView.computeVerticalScrollRange() - recyclerView.getHeight();
+                        int currentScrollOffset = recyclerView.computeVerticalScrollOffset();
+                        int scrollUpOffset = totalScrollRange - currentScrollOffset;
+                        if (scrollUpOffset >= 250) {
+                            binding.scrollToRecentButton.setVisibility(View.VISIBLE);
+                        } else {
+                            binding.scrollToRecentButton.setVisibility(View.INVISIBLE);
+                        }
+                    }
+                }
+        );
+    }
+
     private void handleShowSearchInConversation() {
         this.binding.imageSearch.setOnClickListener(v -> {
-            Intent intent = new Intent(ChatActivity.this, SearchInConversationActivity.class);
+            if (this.selectedMessageFromSIC != null) {
+                this.selectedMessageFromSIC.isHighlighted = false;
+                this.chatMessages.set(this.selectedMessageFromSIC.searchIndex, this.selectedMessageFromSIC);
+                this.chatAdapter.notifyItemChanged(this.selectedMessageFromSIC.searchIndex);
+            }
+
+            Intent intent = new Intent(getApplicationContext(), SearchInConversationActivity.class);
             intent.putExtra("chatMessages", (Serializable) this.chatMessages);
             intent.putExtra(Constant.KEY_USER, this.receiver);
             startActivityForResult(intent, REQUEST_EDIT);
@@ -226,7 +256,13 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     private void handleBackPressed() {
-        binding.imageBack.setOnClickListener(v -> onBackPressed());
+        this.binding.imageBack.setOnClickListener(v -> onBackPressed());
+    }
+
+    private void handleScrollToRecent() {
+        this.binding.scrollToRecentButton.setOnClickListener(v ->  {
+            this.binding.chatRecyclerView.smoothScrollToPosition(this.chatMessages.size() - 1);
+        });
     }
 
     private String getSimpleMessageDateTime(Date date) {
