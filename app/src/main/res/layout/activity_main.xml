@@ -35,7 +35,7 @@
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_toEndOf="@id/profileImage"
-                android:background="@drawable/ic_menu"
+                android:background="@drawable/ic_admin_panel"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 

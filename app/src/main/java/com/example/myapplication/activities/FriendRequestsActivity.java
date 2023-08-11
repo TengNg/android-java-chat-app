@@ -143,7 +143,7 @@ public class FriendRequestsActivity extends AppCompatActivity implements FriendR
 
     @Override
     public void onUserImageClicked(User user) {
-        Intent intent = new Intent(getApplicationContext(), UserInfoActivity.class);
+        Intent intent = new Intent(getApplicationContext(), UserProfileActivity.class);
         intent.putExtra(Constant.KEY_USER, user);
         startActivity(intent);
     }

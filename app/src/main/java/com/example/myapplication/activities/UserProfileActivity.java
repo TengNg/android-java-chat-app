@@ -2,7 +2,6 @@ package com.example.myapplication.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -13,7 +12,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.example.myapplication.databinding.ActivityUserInfoBinding;
+import com.example.myapplication.databinding.ActivityUserProfileBinding;
 import com.example.myapplication.models.User;
 import com.example.myapplication.utilities.Constant;
 import com.example.myapplication.utilities.PreferenceManager;
@@ -35,15 +34,15 @@ enum FriendRequestStatus {
     NOT_FOUND
 }
 
-public class UserInfoActivity extends AppCompatActivity {
-    private ActivityUserInfoBinding binding;
+public class UserProfileActivity extends AppCompatActivity {
+    private ActivityUserProfileBinding binding;
     private PreferenceManager preferenceManager;
     private FirebaseFirestore db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.binding = ActivityUserInfoBinding.inflate(getLayoutInflater());
+        this.binding = ActivityUserProfileBinding.inflate(getLayoutInflater());
         setContentView(this.binding.getRoot());
         this.initialize();
         this.getUserInfo();

@@ -216,7 +216,7 @@ public class ChatActivity extends AppCompatActivity {
 
     private void handleShowUserInfo() {
         this.binding.profileImageView.setOnClickListener(v -> {
-            Intent intent = new Intent(getApplicationContext(), UserInfoActivity.class);
+            Intent intent = new Intent(getApplicationContext(), UserProfileActivity.class);
             intent.putExtra(Constant.KEY_USER, this.receiver);
             startActivity(intent);
         });

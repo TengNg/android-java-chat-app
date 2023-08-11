@@ -64,7 +64,7 @@ public class SignInActivity extends AppCompatActivity {
                         this.preferenceManager.putString(Constant.KEY_NAME, documentSnapshot.getString(Constant.KEY_NAME));
                         this.preferenceManager.putString(Constant.KEY_EMAIL, documentSnapshot.getString(Constant.KEY_EMAIL));
                         this.preferenceManager.putString(Constant.KEY_IMAGE, documentSnapshot.getString(Constant.KEY_IMAGE));
-                        this.preferenceManager.putBoolean(Constant.KEY_IS_ADMIN_ROLE, documentSnapshot.getBoolean(Constant.KEY_IS_ADMIN_ROLE));
+                        this.preferenceManager.putBoolean(Constant.KEY_IS_ADMIN_ROLE, Boolean.TRUE.equals(documentSnapshot.getBoolean(Constant.KEY_IS_ADMIN_ROLE)));
 
                         db.collection(Constant.KEY_COLLECTION_USERS)
                                 .document(preferenceManager.getString(Constant.KEY_USER_ID))

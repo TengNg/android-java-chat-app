@@ -183,7 +183,7 @@ public class FriendsActivity extends BaseActivity implements FriendListener {
 
     @Override
     public void onShowInfoButtonClicked(User user) {
-        Intent intent = new Intent(getApplicationContext(), UserInfoActivity.class);
+        Intent intent = new Intent(getApplicationContext(), UserProfileActivity.class);
         intent.putExtra(Constant.KEY_USER, user);
         startActivity(intent);
     }

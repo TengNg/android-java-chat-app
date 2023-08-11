@@ -4,16 +4,15 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 
-import com.example.myapplication.R;
-import com.example.myapplication.databinding.ActivityCreateUserBinding;
+import com.example.myapplication.databinding.ActivityEditUserInformationBinding;
 
-public class CreateUserActivity extends AppCompatActivity {
-    ActivityCreateUserBinding binding;
+public class EditUserInformationActivity extends AppCompatActivity {
+    ActivityEditUserInformationBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.binding = ActivityCreateUserBinding.inflate(getLayoutInflater());
+        this.binding = ActivityEditUserInformationBinding.inflate(getLayoutInflater());
         setContentView(this.binding.getRoot());
         this.handleBackPressed();
     }

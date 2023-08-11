@@ -1,6 +1,5 @@
 package com.example.myapplication.activities;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -17,27 +16,12 @@ import com.example.myapplication.listeners.UserListener;
 import com.example.myapplication.models.User;
 import com.example.myapplication.utilities.Constant;
 import com.example.myapplication.utilities.PreferenceManager;
-import com.example.myapplication.utilities.Validator;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentChange;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
 
 public class UsersActivity extends AppCompatActivity implements UserListener {
     private ActivityUsersBinding binding;
@@ -133,7 +117,7 @@ public class UsersActivity extends AppCompatActivity implements UserListener {
 
     @Override
     public void onUserClicked(User user) {
-        Intent intent = new Intent(getApplicationContext(), UserInfoActivity.class);
+        Intent intent = new Intent(getApplicationContext(), UserProfileActivity.class);
         intent.putExtra(Constant.KEY_USER, user);
         startActivity(intent);
     }

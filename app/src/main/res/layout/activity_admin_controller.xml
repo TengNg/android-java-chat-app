@@ -5,7 +5,7 @@
     android:id="@+id/ConstraintLayout2"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activities.UsersActivity">
+    tools:context=".activities.admin.AdminControllerActivity">
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/backButtonAd"
@@ -22,13 +22,12 @@
         android:id="@+id/adminFindMoreUserTextView"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
         android:gravity="center"
-        android:text="Controller"
+        android:text="Admin Controller"
         android:textSize="20dp"
         android:textStyle="bold"
-        android:layout_marginEnd="46dp"
         app:layout_constraintBottom_toBottomOf="@+id/backButtonAd"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/backButtonAd"
         app:layout_constraintTop_toTopOf="@+id/backButtonAd" />
 
@@ -50,33 +49,31 @@
         app:layout_constraintTop_toBottomOf="@+id/adminFindMoreUserTextView"
         />
 
-    <LinearLayout
-        android:id="@+id/frameLayout"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/usersRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:orientation="vertical"
+        android:layout_marginBottom="8dp"
         android:padding="16dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:clipToPadding="false"
+        android:orientation="vertical"
+        android:overScrollMode="never"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintBottom_toTopOf="@+id/addBtnAd"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/searchInputAd">
+        app:layout_constraintTop_toBottomOf="@+id/searchInputAd" />
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/adminRecyclerView"
-            android:layout_width="375dp"
-            android:layout_height="553dp"
-            android:clipToPadding="false"
-            android:orientation="vertical"
-            android:overScrollMode="never"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
-
-        <Button
-            android:id="@+id/addBtnAd"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Add new user" />
-
-    </LinearLayout>
+    <Button
+        android:id="@+id/addBtnAd"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="32dp"
+        android:layout_marginBottom="16dp"
+        android:text="Add new user"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <ProgressBar
         android:id="@+id/progressCircular"
