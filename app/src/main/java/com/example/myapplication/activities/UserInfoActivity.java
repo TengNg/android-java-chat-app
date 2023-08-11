@@ -4,7 +4,10 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -14,14 +17,10 @@ import com.example.myapplication.databinding.ActivityUserInfoBinding;
 import com.example.myapplication.models.User;
 import com.example.myapplication.utilities.Constant;
 import com.example.myapplication.utilities.PreferenceManager;
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.protobuf.Api;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -62,10 +61,36 @@ public class UserInfoActivity extends AppCompatActivity {
         this.db = FirebaseFirestore.getInstance();
     }
 
+    private Bitmap getUserImage(String encodedImage){
+        byte[] bytes = Base64.decode(encodedImage, Base64.DEFAULT);
+        return BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+    }
+
     private void getUserInfo() {
         User currentUser = ((User) getIntent().getSerializableExtra(Constant.KEY_USER));
+        this.binding.profileImage.setImageBitmap(this.getUserImage(currentUser.image));
         this.binding.usernameTextView.setText(currentUser.name);
-        this.binding.userEmailTextView.setText(currentUser.email);
+
+        if (currentUser.gender == null || currentUser.email == null) {
+            this.db.collection(Constant.KEY_COLLECTION_USERS)
+                    .document(currentUser.id)
+                    .get()
+                    .addOnSuccessListener(task -> {
+                        if (task.exists()) {
+                            String email = task.getString(Constant.KEY_EMAIL);
+                            String gender = task.getString(Constant.KEY_GENDER);
+                            this.binding.userEmailTextView.setText(email);
+                            this.binding.userGenderTextView.setText(gender);
+                            Log.d("GetUserInfo", task.toString());
+                        } else {
+                            Log.d("MissingUserInfo", "not found");
+                        }
+                    });
+        } else {
+            this.binding.userEmailTextView.setText(currentUser.email);
+            this.binding.userGenderTextView.setText(currentUser.gender);
+        }
+
         this.checkFriendRequestStatus(currentUser.id);
     }
 

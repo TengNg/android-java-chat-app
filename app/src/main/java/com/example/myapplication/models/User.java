@@ -8,6 +8,6 @@ public class User implements Serializable {
     public String token;
     public String id; // could be senderId or receiverId
     public String image;
-
+    public String gender;
     public boolean isAvailable;
 }

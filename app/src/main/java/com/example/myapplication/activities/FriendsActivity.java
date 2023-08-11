@@ -116,6 +116,7 @@ public class FriendsActivity extends BaseActivity implements FriendListener {
                                 String friendEmail = friendDocument.getString(Constant.KEY_EMAIL);
                                 String friendToken = friendDocument.getString(Constant.KEY_FCM_TOKEN);
                                 String image = friendDocument.getString(Constant.KEY_IMAGE);
+                                String gender = friendDocument.getString(Constant.KEY_GENDER);
                                 boolean friendAvailability = Boolean.TRUE.equals(friendDocument.getBoolean(Constant.KEY_IS_AVAILABLE));
                                 User user = new User();
                                 user.name = friendUsername;
@@ -123,6 +124,7 @@ public class FriendsActivity extends BaseActivity implements FriendListener {
                                 user.token = friendToken;
                                 user.id = friendTask.getResult().getId();
                                 user.image = image;
+                                user.gender = gender;
                                 user.isAvailable = friendAvailability;
                                 this.users.add(user);
                                 this.friendsAdapter.notifyDataSetChanged();

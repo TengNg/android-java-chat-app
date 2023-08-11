@@ -15,6 +15,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import com.example.myapplication.R;
 import com.example.myapplication.databinding.ActivitySignUpBinding;
 import com.example.myapplication.utilities.Constant;
 import com.example.myapplication.utilities.PreferenceManager;
@@ -110,6 +111,11 @@ public class SignUpActivity extends AppCompatActivity {
             user.put(Constant.KEY_GENDER, this.binding.femaleRadioButton.getText().toString());
         }
 
+        if (this.encodedImage == null) {
+            Bitmap icon = BitmapFactory.decodeResource(getApplicationContext().getResources(), R.drawable.default_user_image);
+            this.encodedImage = this.encodeImage(icon);
+        }
+
         user.put(Constant.KEY_IMAGE, this.encodedImage);
 
         db.collection(Constant.KEY_COLLECTION_USERS)
@@ -150,10 +156,10 @@ public class SignUpActivity extends AppCompatActivity {
     }
 
     private boolean isValidInput() {
-        if (encodedImage == null) {
-            showToast("Please select your profile image");
-            return false;
-        }
+//        if (encodedImage == null) {
+//            showToast("Please select your profile image");
+//            return false;
+//        }
 
         if (binding.signUpUsernameInput.getText().toString().isEmpty()) {
             showToast("Please enter your username");
