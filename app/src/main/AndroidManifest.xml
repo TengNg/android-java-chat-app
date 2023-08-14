@@ -15,21 +15,24 @@
         android:theme="@style/Theme.MyApplication"
         tools:targetApi="31">
         <activity
-            android:name=".activities.admin.EditUserInformationActivity"
-            android:theme="@style/Theme.MyApplication.NoActionBar"
+            android:name=".activities.admin.UserFriendListActivity"
             android:exported="false" />
+        <activity
+            android:name=".activities.admin.EditUserInformationActivity"
+            android:exported="false"
+            android:theme="@style/Theme.MyApplication.NoActionBar" />
         <activity
             android:name=".activities.admin.UserAccountControllerActivity"
-            android:theme="@style/Theme.MyApplication.NoActionBar"
-            android:exported="false" />
+            android:exported="false"
+            android:theme="@style/Theme.MyApplication.NoActionBar" />
         <activity
             android:name=".activities.admin.CreateUserActivity"
-            android:theme="@style/Theme.MyApplication.NoActionBar"
-            android:exported="false" />
+            android:exported="false"
+            android:theme="@style/Theme.MyApplication.NoActionBar" />
         <activity
             android:name=".activities.admin.AdminControllerActivity"
-            android:theme="@style/Theme.MyApplication.NoActionBar"
-            android:exported="false" />
+            android:exported="false"
+            android:theme="@style/Theme.MyApplication.NoActionBar" />
         <activity
             android:name=".activities.SearchInConversationActivity"
             android:exported="false"

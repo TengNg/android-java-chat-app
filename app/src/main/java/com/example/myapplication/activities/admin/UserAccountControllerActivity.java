@@ -15,8 +15,14 @@ import com.example.myapplication.databinding.ActivityUserAccountControllerBindin
 import com.example.myapplication.models.User;
 import com.example.myapplication.utilities.Constant;
 import com.example.myapplication.utilities.PreferenceManager;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.HashMap;
 
@@ -37,6 +43,7 @@ public class UserAccountControllerActivity extends AppCompatActivity {
         this.handleOpenUserProfileEditor();
         this.handleSetAdminRole();
         this.handleDeleteAccount();
+        this.handleOpenUserFriendList();
     }
 
     private void handleBackPressed() {
@@ -47,7 +54,6 @@ public class UserAccountControllerActivity extends AppCompatActivity {
         this.preferenceManager = new PreferenceManager(getApplicationContext());
         this.db = FirebaseFirestore.getInstance();
         this.currentUser = (User) getIntent().getSerializableExtra(Constant.KEY_USER);
-        Log.d("AdminController > CurrentUserProfile", this.currentUser.toString());
     }
 
     private Bitmap getUserImage(String encodedImage){
@@ -129,16 +135,49 @@ public class UserAccountControllerActivity extends AppCompatActivity {
 
     private void handleDeleteAccount() {
         this.binding.deleteAccountButton.setOnClickListener(v -> {
-            this.db.collection(Constant.KEY_COLLECTION_USERS).document(this.currentUser.id)
-                    .delete()
-                    .addOnSuccessListener(task -> {
-                        this.showToast("Account deleted");
-                        Intent intent = new Intent(getApplicationContext(), AdminControllerActivity.class);
-                        startActivity(intent);
-                    })
-                    .addOnFailureListener(e -> {
-                        this.showToast("Failed to delete this account");
-                    });
+            this.deleteAccount();
+        });
+    }
+
+    private void deleteAccount() {
+        CollectionReference usersCollection = db.collection(Constant.KEY_COLLECTION_USERS);
+        DocumentReference userRef = usersCollection.document(this.currentUser.id);
+
+        HashMap<String, Object> newData = new HashMap<>();
+        newData.put(Constant.KEY_NAME, "Deleted user");
+        newData.put(Constant.KEY_EMAIL, FieldValue.delete());
+        newData.put(Constant.KEY_PASSWORD, FieldValue.delete());
+        newData.put(Constant.KEY_IS_DELETED, true);
+
+        Task<Void> deleteUserTask = userRef.update(newData);
+        CollectionReference friendsCollection = userRef.collection(Constant.KEY_COLLECTION_USER_FRIENDS);
+
+        friendsCollection.get().addOnCompleteListener(friendsTask -> {
+            if (friendsTask.isSuccessful()) {
+                QuerySnapshot friendsSnapshot = friendsTask.getResult();
+                for (DocumentSnapshot friendDoc : friendsSnapshot.getDocuments()) {
+                    String friendID = friendDoc.getId();
+                    DocumentReference friendRef = usersCollection.document(friendID);
+                    friendRef.collection(Constant.KEY_COLLECTION_USER_FRIENDS).document(this.currentUser.id).delete();
+                }
+            } else {
+                this.showToast("Failed to delete this account");
+            }
+        });
+
+        try {
+            Tasks.await(deleteUserTask);
+            this.showToast("Account deleted");
+        } catch (Exception e) {
+            this.showToast("Failed to delete this account");
+        }
+    }
+
+    private void handleOpenUserFriendList() {
+        this.binding.showFriendListButton.setOnClickListener(v -> {
+            Intent intent = new Intent(getApplicationContext(), UserFriendListActivity.class);
+            intent.putExtra(Constant.KEY_USER, this.currentUser);
+            startActivity(intent);
         });
     }
 }

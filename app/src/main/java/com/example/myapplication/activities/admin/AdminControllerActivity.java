@@ -4,6 +4,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 
@@ -38,6 +40,7 @@ public class AdminControllerActivity extends AppCompatActivity implements AdminR
         this.handleBackPressed();
         this.handleOpenCreateUserActivity();
         this.listenUsers();
+        this.handleOnSearchFieldChanged();
     }
 
     private void initialize() {
@@ -60,6 +63,9 @@ public class AdminControllerActivity extends AppCompatActivity implements AdminR
 
         if (value != null) {
             for (DocumentChange documentChange : value.getDocumentChanges()) {
+                if (documentChange.getDocument().contains(Constant.KEY_IS_DELETED))
+                    continue;
+
                 if (documentChange.getDocument().getId().equals(this.preferenceManager.getString(Constant.KEY_USER_ID)))
                     continue;
 
@@ -73,8 +79,7 @@ public class AdminControllerActivity extends AppCompatActivity implements AdminR
                     u.isAdminRole = Boolean.TRUE.equals(documentChange.getDocument().getBoolean(Constant.KEY_IS_ADMIN_ROLE));
                     this.users.add(u);
                     this.usersAdapter.notifyDataSetChanged();
-                }
-                else if (documentChange.getType() == DocumentChange.Type.REMOVED) {
+                } else if (documentChange.getType() == DocumentChange.Type.REMOVED) {
 
                 }
             }
@@ -84,6 +89,35 @@ public class AdminControllerActivity extends AppCompatActivity implements AdminR
 
         this.binding.progressCircular.setVisibility(View.GONE);
     };
+
+    private void handleOnSearchFieldChanged() {
+        this.binding.searchInputAd.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                if (editable.length() == 0) {
+                    usersAdapter.updateList(users);
+                    return;
+                }
+
+                List<User> filteredList = new ArrayList<>();
+                for (User user : users) {
+                    if (user.name.contains(editable.toString())) {
+                        filteredList.add(user);
+                    }
+                }
+
+                usersAdapter.updateList(filteredList);
+            }
+        });
+    }
 
 //    private void getUsers() {
 //        this.db.collection(Constant.KEY_COLLECTION_USERS)

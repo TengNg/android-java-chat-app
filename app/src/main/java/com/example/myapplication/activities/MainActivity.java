@@ -50,7 +50,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
-public class MainActivity extends AppCompatActivity implements ConversationsListener {
+public class MainActivity extends BaseActivity implements ConversationsListener {
     List<ChatMessage> recentConversations;
     ActivityMainBinding binding;
     PreferenceManager preferenceManager;
@@ -141,10 +141,12 @@ public class MainActivity extends AppCompatActivity implements ConversationsList
 
     private void updateToken(String token) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        DocumentReference dr = db.collection(Constant.KEY_COLLECTION_USERS).document(preferenceManager.getString(Constant.KEY_USER_ID));
-        dr.update(Constant.KEY_FCM_TOKEN, token)
-                .addOnSuccessListener(unused -> Log.d("UpdateToken", "Token updated successfully"))
-                .addOnFailureListener(ex -> Log.d("UpdateToken", "Unable to update token"));
+        if (!this.preferenceManager.contains(Constant.KEY_IS_SIGNED_IN)) {
+            DocumentReference dr = db.collection(Constant.KEY_COLLECTION_USERS).document(preferenceManager.getString(Constant.KEY_USER_ID));
+            dr.update(Constant.KEY_FCM_TOKEN, token)
+                    .addOnSuccessListener(unused -> showToast("Token updated successfully"))
+                    .addOnFailureListener(ex -> Log.d("UpdateToken", "Unable to update token"));
+        }
     }
 
     private void listenConversations() {
@@ -351,6 +353,8 @@ public class MainActivity extends AppCompatActivity implements ConversationsList
                     finish();
                 })
                 .addOnFailureListener(ex -> {
+                    preferenceManager.clear();
+                    startActivity(new Intent(getApplicationContext(), SignInActivity.class));
                     showToast("Unable to sign out");
                 });
     }

@@ -191,15 +191,15 @@ public class SignUpActivity extends AppCompatActivity {
             return false;
         }
 
-        if (!Validator.isValidEmail(this.binding.signUpEmailInput.getText().toString())) {
-            showToast("Email is not valid");
-            return false;
-        }
-
-        if (!Validator.isValidPassword(this.binding.signUpPasswordInput.getText().toString())) {
-            showToast("Password is not valid");
-            return false;
-        }
+//        if (!Validator.isValidEmail(this.binding.signUpEmailInput.getText().toString())) {
+//            showToast("Email is not valid");
+//            return false;
+//        }
+//
+//        if (!Validator.isValidPassword(this.binding.signUpPasswordInput.getText().toString())) {
+//            showToast("Password is not valid");
+//            return false;
+//        }
 
         return true;
     }

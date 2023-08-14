@@ -20,6 +20,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -74,9 +75,10 @@ public class NotificationActivity extends AppCompatActivity implements Notificat
                                 friendRequest.dateObject = document.getDate(Constant.KEY_TIMESTAMP);
                                 friendRequest.dateTime = getSimpleMessageDateTime(friendRequest.dateObject);
                                 this.notifications.add(friendRequest);
-                                this.notificationsAdapter.notifyDataSetChanged();
                             }
                         }
+                        this.notifications.sort(Comparator.comparing(o -> o.dateObject));
+                        this.notificationsAdapter.notifyDataSetChanged();
                         this.binding.progressCircular.setVisibility(View.GONE);
                     } else {
                         Log.d("Error", "Can't get any notification");

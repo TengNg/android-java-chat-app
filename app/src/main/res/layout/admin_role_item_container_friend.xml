@@ -32,24 +32,13 @@
         app:layout_constraintTop_toBottomOf="@+id/nameTextView" />
 
     <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/infoImage"
+        android:id="@+id/removeFriendButton"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:background="@drawable/ic_friend_info"
+        android:background="@drawable/ic_decline"
         app:layout_constraintBottom_toBottomOf="@+id/emailTextView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/nameTextView" />
-
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/activeStatusImage"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:background="@drawable/ic_active"
-        app:layout_constraintBottom_toBottomOf="@+id/nameTextView"
-        app:layout_constraintStart_toEndOf="@+id/nameTextView"
-        app:layout_constraintTop_toTopOf="@+id/nameTextView"
-        android:visibility="invisible"
-        />
 
     <com.makeramen.roundedimageview.RoundedImageView
         android:id="@+id/profileImageView"

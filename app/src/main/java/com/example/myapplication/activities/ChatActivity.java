@@ -60,7 +60,7 @@ public class ChatActivity extends AppCompatActivity {
         handleShowSearchInConversation();
         handleScrollToRecent();
         listenMessages();
-        listenFriendActiveStatus();
+        listenFriend();
 
         handleChatRecyclerViewOnScrolled();
     }
@@ -144,10 +144,8 @@ public class ChatActivity extends AppCompatActivity {
                 .addSnapshotListener(eventListener);
     }
 
-    private void listenFriendActiveStatus() {
-        User currentUser = (User) getIntent().getSerializableExtra(Constant.KEY_USER);
-
-        DocumentReference docRef = db.collection(Constant.KEY_COLLECTION_USERS).document(currentUser.id);
+    private void listenFriend() {
+        DocumentReference docRef = db.collection(Constant.KEY_COLLECTION_USERS).document(this.receiver.id);
 
         docRef.addSnapshotListener((snapshot, e) -> {
             if (e != null) {
@@ -157,11 +155,19 @@ public class ChatActivity extends AppCompatActivity {
 
             if (snapshot != null && snapshot.exists()) {
                 boolean isAvail = snapshot.getBoolean(Constant.KEY_IS_AVAILABLE);
+                boolean isDeleted = snapshot.contains(Constant.KEY_IS_DELETED);
 
-                if (isAvail == true) {
+                if (isAvail) {
                     this.binding.activeStatusImage.setVisibility(View.VISIBLE);
                 } else {
                     this.binding.activeStatusImage.setVisibility(View.INVISIBLE);
+                }
+
+                if (isDeleted) {
+                    this.receiver.isDeleted = true;
+                    this.binding.usernameTextView.setText(this.receiver.name + "(Deleted)");
+                    this.binding.messageInput.setVisibility(View.GONE);
+                    this.binding.sendButton.setVisibility(View.GONE);
                 }
 
             } else {

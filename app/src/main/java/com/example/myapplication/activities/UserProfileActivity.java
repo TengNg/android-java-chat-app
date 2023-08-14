@@ -38,6 +38,7 @@ public class UserProfileActivity extends AppCompatActivity {
     private ActivityUserProfileBinding binding;
     private PreferenceManager preferenceManager;
     private FirebaseFirestore db;
+    private User currentUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,8 +46,17 @@ public class UserProfileActivity extends AppCompatActivity {
         this.binding = ActivityUserProfileBinding.inflate(getLayoutInflater());
         setContentView(this.binding.getRoot());
         this.initialize();
-        this.getUserInfo();
         this.handleBackPressed();
+        this.currentUser = ((User) getIntent().getSerializableExtra(Constant.KEY_USER));
+        this.getUserInfo();
+    }
+
+    private void initialize() {
+        this.preferenceManager = new PreferenceManager(getApplicationContext());
+        this.db = FirebaseFirestore.getInstance();
+    }
+
+    private void setFriendRequestStatus() {
         this.handleOpenConversation();
         this.handleAddFriend();
         this.handleUnfriend();
@@ -55,42 +65,41 @@ public class UserProfileActivity extends AppCompatActivity {
         this.handleRemovePendingSentFriendRequest();
     }
 
-    private void initialize() {
-        this.preferenceManager = new PreferenceManager(getApplicationContext());
-        this.db = FirebaseFirestore.getInstance();
-    }
-
     private Bitmap getUserImage(String encodedImage){
         byte[] bytes = Base64.decode(encodedImage, Base64.DEFAULT);
         return BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
     }
 
     private void getUserInfo() {
-        User currentUser = ((User) getIntent().getSerializableExtra(Constant.KEY_USER));
-        this.binding.profileImage.setImageBitmap(this.getUserImage(currentUser.image));
-        this.binding.usernameTextView.setText(currentUser.name);
-
-        if (currentUser.gender == null || currentUser.email == null) {
-            this.db.collection(Constant.KEY_COLLECTION_USERS)
-                    .document(currentUser.id)
-                    .get()
-                    .addOnSuccessListener(task -> {
-                        if (task.exists()) {
-                            String email = task.getString(Constant.KEY_EMAIL);
-                            String gender = task.getString(Constant.KEY_GENDER);
-                            this.binding.userEmailTextView.setText(email);
-                            this.binding.userGenderTextView.setText(gender);
-                            Log.d("GetUserInfo", task.toString());
-                        } else {
-                            Log.d("MissingUserInfo", "not found");
-                        }
-                    });
-        } else {
-            this.binding.userEmailTextView.setText(currentUser.email);
-            this.binding.userGenderTextView.setText(currentUser.gender);
+        if (this.currentUser.isDeleted) {
+            this.binding.usernameTextView.setText("Deleted User");
+            return;
         }
 
-        this.checkFriendRequestStatus(currentUser.id);
+        this.db.collection(Constant.KEY_COLLECTION_USERS)
+                .document(currentUser.id)
+                .get()
+                .addOnSuccessListener(task -> {
+                    if (task.exists()) {
+                        if (task.contains(Constant.KEY_IS_DELETED)) {
+                            this.binding.usernameTextView.setText("Deleted user");
+                        } else {
+                            String name = task.getString(Constant.KEY_NAME);
+                            String image = task.getString(Constant.KEY_IMAGE);
+                            String email = task.getString(Constant.KEY_EMAIL);
+                            String gender = task.getString(Constant.KEY_GENDER);
+                            this.binding.usernameTextView.setText(name);
+                            this.binding.userEmailTextView.setText(email);
+                            this.binding.userGenderTextView.setText(gender);
+                            this.binding.profileImage.setImageBitmap(this.getUserImage(image));
+
+                            this.setFriendRequestStatus();
+                            this.checkFriendRequestStatus(currentUser.id);
+                        }
+                    } else {
+                        Log.d("MissingUserInfo", "not found");
+                    }
+                });
     }
 
     public void checkFriendRequestStatus(String specificUserId) {

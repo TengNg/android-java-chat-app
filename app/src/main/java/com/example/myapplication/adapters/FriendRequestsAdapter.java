@@ -87,6 +87,7 @@ public class FriendRequestsAdapter extends RecyclerView.Adapter<FriendRequestsAd
                 User user = new User();
                 user.id = friendRequest.senderId;
                 user.name = friendRequest.senderName;
+                user.image = friendRequest.senderImage;
                 friendRequestListener.onUserImageClicked(user);
             });
 

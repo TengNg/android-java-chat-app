@@ -80,6 +80,13 @@
         app:layout_constraintTop_toBottomOf="@+id/profileImageReceiverView">
 
         <Button
+            android:id="@+id/showFriendListButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="show friend list" />
+
+        <Button
             android:id="@+id/editButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

@@ -87,6 +87,8 @@ public class UsersActivity extends AppCompatActivity implements UserListener {
                             if (task.isSuccessful() && task.getResult() != null) {
                                 List<User> result = new ArrayList<>();
                                 for (QueryDocumentSnapshot queryDocumentSnapshot : task.getResult()) {
+                                    if (queryDocumentSnapshot.contains(Constant.KEY_IS_DELETED))
+                                        continue;
                                     if (currentUserId.equals(queryDocumentSnapshot.getId()))
                                         continue;
                                     User u = new User();

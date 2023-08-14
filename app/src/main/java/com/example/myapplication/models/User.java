@@ -13,6 +13,7 @@ public class User implements Serializable {
     public String gender;
     public boolean isAvailable;
     public boolean isAdminRole;
+    public boolean isDeleted;
 
     @NonNull
     @Override

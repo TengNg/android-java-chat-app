@@ -22,6 +22,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -87,13 +88,14 @@ public class FriendRequestsActivity extends AppCompatActivity implements FriendR
                     friendRequest.dateObject = document.getDocument().getDate(Constant.KEY_TIMESTAMP);
                     friendRequest.dateTime = getSimpleMessageDateTime(friendRequest.dateObject);
                     this.friendRequests.add(friendRequest);
-                    this.friendRequestsAdapter.notifyDataSetChanged();
                 } else if (document.getType() == DocumentChange.Type.REMOVED) {
                     this.friendRequests.remove(idx);
-                    this.friendRequestsAdapter.notifyDataSetChanged();
                 }
                 idx += 1;
             }
+
+            this.friendRequests.sort(Comparator.comparing(o -> o.dateObject));
+            this.friendRequestsAdapter.notifyDataSetChanged();
             this.binding.progressCircular.setVisibility(View.GONE);
         }
     };

@@ -18,6 +18,7 @@ public class Constant {
     public static final String KEY_FRIEND_REQUEST_STATUS = "status";
     public static final String KEY_FRIEND_REQUEST = "friendRequest";
     public static final String KEY_IS_ADMIN_ROLE = "isAdminRole";
+    public static final String KEY_IS_DELETED = "isDeleted";
 
     // Chat ==========
     public static final String KEY_USER = "user";
