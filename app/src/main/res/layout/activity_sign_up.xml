@@ -68,7 +68,7 @@
                 android:background="@drawable/custom_edittext"
                 android:drawableLeft="@drawable/ic_person"
                 android:drawablePadding="8dp"
-                android:hint="UserName"
+                android:hint="Name"
                 android:padding="8dp"
                 android:textColor="@color/black" />
 
