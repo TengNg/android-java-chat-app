@@ -11,7 +11,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Base64;
-import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -27,8 +26,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.HashMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class SignUpActivity extends AppCompatActivity {
     private ActivitySignUpBinding binding;
@@ -191,15 +188,15 @@ public class SignUpActivity extends AppCompatActivity {
             return false;
         }
 
-//        if (!Validator.isValidEmail(this.binding.signUpEmailInput.getText().toString())) {
-//            showToast("Email is not valid");
-//            return false;
-//        }
-//
-//        if (!Validator.isValidPassword(this.binding.signUpPasswordInput.getText().toString())) {
-//            showToast("Password is not valid");
-//            return false;
-//        }
+        if (!Validator.isValidEmail(this.binding.signUpEmailInput.getText().toString())) {
+            showToast("Email is not valid");
+            return false;
+        }
+
+        if (!Validator.isValidPassword(this.binding.signUpPasswordInput.getText().toString())) {
+            showToast("Password is not valid");
+            return false;
+        }
 
         return true;
     }

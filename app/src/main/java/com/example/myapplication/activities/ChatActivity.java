@@ -154,7 +154,7 @@ public class ChatActivity extends AppCompatActivity {
             }
 
             if (snapshot != null && snapshot.exists()) {
-                boolean isAvail = snapshot.getBoolean(Constant.KEY_IS_AVAILABLE);
+                boolean isAvail = Boolean.TRUE.equals(snapshot.getBoolean(Constant.KEY_IS_AVAILABLE));
                 boolean isDeleted = snapshot.contains(Constant.KEY_IS_DELETED);
 
                 if (isAvail) {

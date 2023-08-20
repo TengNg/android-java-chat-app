@@ -312,8 +312,6 @@ public class MainActivity extends BaseActivity implements ConversationsListener 
                 if (!isUsersActivityVisible()) {
                     startActivity(new Intent(this, UsersActivity.class));
                 }
-            } else if (id == R.id.nav_settings) {
-                showToast("Settings clicked");
             } else if (id == R.id.nav_logout) {
                 drawerLayout.closeDrawers();
                 signOut();
