@@ -20,11 +20,6 @@
     <item android:title="@string/nav_account">
         <menu>
             <item
-                android:id="@+id/nav_settings"
-                android:title="Settings"
-                android:icon="@drawable/ic_settings"/>
-
-            <item
                 android:id="@+id/nav_logout"
                 android:title="Log Out"
                 android:icon="@drawable/ic_send"/>

@@ -129,7 +129,7 @@ public class EditUserInformationActivity extends AppCompatActivity {
         newData.put(Constant.KEY_NAME, binding.editUsernameInput.getText().toString());
 
         if (!this.currentUser.email.equals(binding.editEmailInput.getText().toString())) {
-            newData.put(Constant.KEY_EMAIL, this.currentUser.email);
+            newData.put(Constant.KEY_EMAIL, binding.editEmailInput.getText().toString());
         }
 
         newData.put(Constant.KEY_IMAGE, this.currentUser.image);
